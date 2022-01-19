@@ -16,12 +16,24 @@ func TestSelectNotExistedMenu(t *testing.T) {
 	assert.Error(t, err, "menu doesnt exist")
 }
 
-func TestSelectMultipleExistedMenu(t *testing.T) {
-	foods := MultiSelectMenu("mg002", "mk002")
-	assert.Equal(t, []string{"babi guling mentai", "opor anjing manado"}, foods)
-}
+func TestCorrectMakeOrder(t *testing.T) {
+	var items []Item = []Item{
+		{Qty: 2, Food: Food{Id: "mg001"}},
+		{Qty: 3, Food: Food{Id: "mk001"}},
+	}
+	o := MakeOrder(&items)
 
-func TestSelectMultipleMenuWithAnInvalidId(t *testing.T) {
-	foods := MultiSelectMenu("mg001", "TONGKOL", "mk001")
-	assert.Equal(t, foods[1], "")
+	// Name of items should be correct
+	assert.Equal(t, o.Items[0].Food.Name, "tempe goreng")
+	assert.Equal(t, o.Items[1].Food.Name, "bakso nanas")
+
+	// Item total should be correct
+	assert.Equal(t, o.Items[0].Total, 2000)
+	assert.Equal(t, o.Items[1].Total, 36000)
+
+	// Order total should be correct
+	assert.Equal(t, o.Total, 38000)
+
+	// Have a proper Id
+	assert.NotNil(t, o.Id)
 }
