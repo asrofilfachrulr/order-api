@@ -1,0 +1,23 @@
+Overview:
+1. Pelanggan memilih makanan pada website
+2. Pelanggan mengirimkan pesanan ke kasir, kasir mendapatkan new incoming pesanan di dashboard
+3. Pelanggan datang ke kasir untuk membayar
+4. Kasir generate QR Code dan ditampilkan ke pelanggan, pelanggan scan QR Code tsb di E Wallet kesayangan
+5. Pembayaran selesai, kasir memastikan pembayaran benar benar selesai lalu menawarkan pemilihan tempat duduk
+6. Pelanggan dapat nomor tempat duduk
+7. Pelanggan tinggal menunggu pesanan diantarkan
+
+Add new order while have ordered and have been served case:
+1. While on their table, customer selects "add another order"  on website
+2. Customer creates desired order list
+3. Customer sends order
+4. Customer goes back to cashier and the rest is same as the previous case. Except, customer doesnt choose table anymore but only telling where their table has been choosen.
+
+Security Technical Overview:
+1. To prevent any malicous and harmannful action especially ddos, website is not publicly open. Website is running on LAN
+2. LAN is not protected but every customer need to show their WIFI Mac Address and will be registered so only registered MAC Address request will be handled by server through router. This WiFi Mac Address need to be deleted if customer have been leave or need to be reset if customer doesn't send order in 15 minutes.
+
+
+Buat aplikasi:
+WhatMyMacAddress
+Jd tinggal buka lgsg qrcode, Nanti pegawai lgsg scan.Lgsg ter entry
