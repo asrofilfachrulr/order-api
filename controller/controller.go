@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"math/rand"
 	"san_dong/dummy"
 	"san_dong/model"
@@ -55,7 +56,19 @@ func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
 *
  */
 
+func contain(order model.CompleteOrder, listorder model.ListOrder) bool {
+	for _, lo := range listorder.ListOrder {
+		if lo.Id == order.Id {
+			return true
+		}
+	}
+	return false
+}
+
 func FinishOrder(order *model.CompleteOrder) error {
+	if contain(*order, ListOrderRuntime) {
+		return errors.New("Order id: " + order.Id + " existed")
+	}
 	ListOrderRuntime.ListOrder = append(ListOrderRuntime.ListOrder, *order)
 
 	return nil

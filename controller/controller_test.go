@@ -88,3 +88,17 @@ func TestMultipleFinishOrder(t *testing.T) {
 	assert.Equal(t, ListOrderRuntime.ListOrder[1], *order2)
 	assert.Equal(t, ListOrderRuntime.ListOrder[2], *order3)
 }
+
+func TestDuplicateIdFinishOrder(t *testing.T) {
+	var items []model.Item = []model.Item{
+		{Qty: 1, Food: model.Food{Id: "mg002"}},
+		{Qty: 1, Food: model.Food{Id: "mk002"}},
+	}
+
+	co, _ := MakeOrder(items)
+	first := FinishOrder(co)
+	second := FinishOrder(co)
+
+	assert.Nil(t, first)
+	assert.EqualError(t, second, "Order id: "+co.Id+" existed")
+}
