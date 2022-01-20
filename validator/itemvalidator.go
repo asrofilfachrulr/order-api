@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+/*
+* 	Validate []Item with follwoing conditions:
+*    a. Item Quantity must be at least 1
+*	 b. Item.Food.Id must be present in db
+ */
+
 func ValidateItem(item []model.Item) error {
 	var ErrMsg []string
 

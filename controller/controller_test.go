@@ -1,21 +1,12 @@
 package controller
 
 import (
+	"log"
 	"san_dong/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestSelectExistedMenu(t *testing.T) {
-	food, _ := SelectMenu("mg001")
-	assert.Equal(t, food, "tempe goreng")
-}
-
-func TestSelectNotExistedMenu(t *testing.T) {
-	_, err := SelectMenu("YouR DoG wiLl cOde")
-	assert.Error(t, err, "menu doesnt exist")
-}
 
 func TestCorrectMakeOrder(t *testing.T) {
 	var items []model.Item = []model.Item{
@@ -47,4 +38,53 @@ func TestIncorrectOrder(t *testing.T) {
 	_, err := MakeOrder(items)
 
 	assert.EqualError(t, err, "error: invalid quantity (-1), invalid id (iAm aN InvAlIId IDD)")
+}
+
+func TestFinishOrder(t *testing.T) {
+	var items []model.Item = []model.Item{
+		{Qty: 2, Food: model.Food{Id: "mg001"}},
+		{Qty: 3, Food: model.Food{Id: "mk001"}},
+	}
+	o, _ := MakeOrder(items)
+
+	FinishOrder(o)
+	log.Println(ListOrderRuntime)
+
+	// ListOrderRuntime should have an item right now
+	assert.Equal(t, len(ListOrderRuntime.ListOrder), 1)
+
+	// the first item of ListOrderRuntime.ListOrder should be o
+	assert.Equal(t, ListOrderRuntime.ListOrder[0], *o)
+}
+
+func TestMultipleFinishOrder(t *testing.T) {
+	var items1 []model.Item = []model.Item{
+		{Qty: 2, Food: model.Food{Id: "mg001"}},
+		{Qty: 3, Food: model.Food{Id: "mk001"}},
+	}
+	order1, _ := MakeOrder(items1)
+	FinishOrder(order1)
+
+	var items2 []model.Item = []model.Item{
+		{Qty: 1, Food: model.Food{Id: "mg002"}},
+		{Qty: 1, Food: model.Food{Id: "mk002"}},
+	}
+	order2, _ := MakeOrder(items2)
+	FinishOrder(order2)
+
+	var items3 []model.Item = []model.Item{
+		{Qty: 7, Food: model.Food{Id: "mg001"}},
+	}
+	order3, _ := MakeOrder(items3)
+	FinishOrder(order3)
+
+	log.Println(ListOrderRuntime)
+
+	// ListOrderRuntime.ListOrder should have length of 3
+	assert.Equal(t, len(ListOrderRuntime.ListOrder), 3)
+
+	// ListOrderRuntime.ListOrder should have apropriate complete order
+	assert.Equal(t, ListOrderRuntime.ListOrder[0], *order1)
+	assert.Equal(t, ListOrderRuntime.ListOrder[1], *order2)
+	assert.Equal(t, ListOrderRuntime.ListOrder[2], *order3)
 }

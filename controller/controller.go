@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-	"fmt"
 	"math/rand"
 	"san_dong/dummy"
 	"san_dong/model"
@@ -10,7 +8,10 @@ import (
 	"strconv"
 )
 
+var ListOrderRuntime model.ListOrder
+
 /*
+*	Create a complete order object (CompleteOrder) that'll be used for payment
 *	Front End sends []Item with each Item object present following attributes:
 *   1. Qty <Present>
 *   2. Food <Present>
@@ -24,7 +25,6 @@ import (
 *	If qty invalid => error
 *
  */
-
 func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
 	t := 0
 	err := validator.ValidateItem(item)
@@ -34,26 +34,29 @@ func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
 
 	for i := 0; i < len(item); i++ {
 
-		item[i].Food.Name, _ = SelectMenu(item[i].Food.Id)
+		item[i].Food.Name, _ = validator.ValidateMenuId(item[i].Food.Id)
 		item[i].Food.Price = dummy.Price[item[i].Food.Id]
 		item[i].Total = item[i].Food.Price * item[i].Qty
 		t += item[i].Total
 		// fmt.Println(t)
 	}
 
-	fmt.Println(item)
-
 	return &model.CompleteOrder{
 		Items: item,
-		Id:    strconv.Itoa(rand.Int()),
+		Id:    "order-" + strconv.Itoa(rand.Int()),
 		Total: t,
 	}, nil
 }
 
-func SelectMenu(id string) (string, error) {
-	if v, ok := dummy.Menu[id]; ok {
-		return v, nil
-	}
+/*
+*	Take created CompleteOrder send (add) to runtime object
+*	which is ListOrder to provide shareable information
+*	with cashier
+*
+ */
 
-	return "", errors.New("menu doesnt exist")
+func FinishOrder(order *model.CompleteOrder) error {
+	ListOrderRuntime.ListOrder = append(ListOrderRuntime.ListOrder, *order)
+
+	return nil
 }
