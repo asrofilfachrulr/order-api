@@ -4,12 +4,11 @@ import (
 	"errors"
 	"math/rand"
 	"san_dong/dummy"
+	"san_dong/inmemory"
 	"san_dong/model"
 	"san_dong/validator"
 	"strconv"
 )
-
-var ListOrderRuntime model.ListOrder
 
 /*
 *	Create a complete order object (CompleteOrder) that'll be used for payment
@@ -66,10 +65,10 @@ func contain(order model.CompleteOrder, listorder model.ListOrder) bool {
 }
 
 func FinishOrder(order *model.CompleteOrder) error {
-	if contain(*order, ListOrderRuntime) {
+	if contain(*order, inmemory.ListOrderRuntime) {
 		return errors.New("Order id: " + order.Id + " existed")
 	}
-	ListOrderRuntime.ListOrder = append(ListOrderRuntime.ListOrder, *order)
+	inmemory.ListOrderRuntime.ListOrder = append(inmemory.ListOrderRuntime.ListOrder, *order)
 
 	return nil
 }

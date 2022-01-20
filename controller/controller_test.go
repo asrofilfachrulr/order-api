@@ -2,6 +2,7 @@ package controller
 
 import (
 	"log"
+	"san_dong/inmemory"
 	"san_dong/model"
 	"testing"
 
@@ -48,13 +49,13 @@ func TestFinishOrder(t *testing.T) {
 	o, _ := MakeOrder(items)
 
 	FinishOrder(o)
-	log.Println(ListOrderRuntime)
+	log.Println(inmemory.ListOrderRuntime)
 
 	// ListOrderRuntime should have an item right now
-	assert.Equal(t, len(ListOrderRuntime.ListOrder), 1)
+	assert.Equal(t, len(inmemory.ListOrderRuntime.ListOrder), 1)
 
 	// the first item of ListOrderRuntime.ListOrder should be o
-	assert.Equal(t, ListOrderRuntime.ListOrder[0], *o)
+	assert.Equal(t, inmemory.ListOrderRuntime.ListOrder[0], *o)
 }
 
 func TestMultipleFinishOrder(t *testing.T) {
@@ -78,15 +79,15 @@ func TestMultipleFinishOrder(t *testing.T) {
 	order3, _ := MakeOrder(items3)
 	FinishOrder(order3)
 
-	log.Println(ListOrderRuntime)
+	log.Println(inmemory.ListOrderRuntime)
 
 	// ListOrderRuntime.ListOrder should have length of 3
-	assert.Equal(t, len(ListOrderRuntime.ListOrder), 3)
+	assert.Equal(t, len(inmemory.ListOrderRuntime.ListOrder), 3)
 
 	// ListOrderRuntime.ListOrder should have apropriate complete order
-	assert.Equal(t, ListOrderRuntime.ListOrder[0], *order1)
-	assert.Equal(t, ListOrderRuntime.ListOrder[1], *order2)
-	assert.Equal(t, ListOrderRuntime.ListOrder[2], *order3)
+	assert.Equal(t, inmemory.ListOrderRuntime.ListOrder[0], *order1)
+	assert.Equal(t, inmemory.ListOrderRuntime.ListOrder[1], *order2)
+	assert.Equal(t, inmemory.ListOrderRuntime.ListOrder[2], *order3)
 }
 
 func TestDuplicateIdFinishOrder(t *testing.T) {
