@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"san_dong/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,11 +18,11 @@ func TestSelectNotExistedMenu(t *testing.T) {
 }
 
 func TestCorrectMakeOrder(t *testing.T) {
-	var items []Item = []Item{
-		{Qty: 2, Food: Food{Id: "mg001"}},
-		{Qty: 3, Food: Food{Id: "mk001"}},
+	var items []model.Item = []model.Item{
+		{Qty: 2, Food: model.Food{Id: "mg001"}},
+		{Qty: 3, Food: model.Food{Id: "mk001"}},
 	}
-	o := MakeOrder(&items)
+	o, _ := MakeOrder(items)
 
 	// Name of items should be correct
 	assert.Equal(t, o.Items[0].Food.Name, "tempe goreng")
@@ -36,4 +37,14 @@ func TestCorrectMakeOrder(t *testing.T) {
 
 	// Have a proper Id
 	assert.NotNil(t, o.Id)
+}
+
+func TestIncorrectOrder(t *testing.T) {
+	var items []model.Item = []model.Item{
+		{Qty: -1, Food: model.Food{Id: "mg001"}},              // invalid quantity
+		{Qty: 3, Food: model.Food{Id: "iAm aN InvAlIId IDD"}}, // invalid id
+	}
+	_, err := MakeOrder(items)
+
+	assert.EqualError(t, err, "error: invalid quantity (-1), invalid id (iAm aN InvAlIId IDD)")
 }

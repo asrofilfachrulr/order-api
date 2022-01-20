@@ -4,39 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"san_dong/dummy"
+	"san_dong/model"
+	"san_dong/validator"
 	"strconv"
 )
-
-var menu = map[string]string{
-	"mg001": "tempe goreng",
-	"mk001": "bakso nanas",
-	"mg002": "babi guling mentai",
-	"mk002": "opor anjing manado",
-}
-var price = map[string]int{
-	"mg001": 1000,
-	"mk001": 12000,
-	"mg002": 69000,
-	"mk002": 99000,
-}
-
-type CompleteOrder struct {
-	Items []Item
-	Id    string
-	Total int
-}
-
-type Item struct {
-	Qty   int
-	Food  Food
-	Total int
-}
-
-type Food struct {
-	Id    string
-	Name  string
-	Price int
-}
 
 /*
 *	Front End sends []Item with each Item object present following attributes:
@@ -48,29 +20,38 @@ type Food struct {
 *	3. Total <Absent>
 *
 *	MakeOrder completes all the absent attribute's values
+*
+*	If qty invalid => error
+*
  */
-func MakeOrder(item *[]Item) *CompleteOrder {
-	t := 0
 
-	for i := 0; i < len(*item); i++ {
-		(*item)[i].Food.Name, _ = SelectMenu((*item)[i].Food.Id)
-		(*item)[i].Food.Price = price[(*item)[i].Food.Id]
-		(*item)[i].Total = (*item)[i].Food.Price * (*item)[i].Qty
-		t += (*item)[i].Total
+func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
+	t := 0
+	err := validator.ValidateItem(item)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < len(item); i++ {
+
+		item[i].Food.Name, _ = SelectMenu(item[i].Food.Id)
+		item[i].Food.Price = dummy.Price[item[i].Food.Id]
+		item[i].Total = item[i].Food.Price * item[i].Qty
+		t += item[i].Total
 		// fmt.Println(t)
 	}
 
 	fmt.Println(item)
 
-	return &CompleteOrder{
-		Items: *item,
+	return &model.CompleteOrder{
+		Items: item,
 		Id:    strconv.Itoa(rand.Int()),
 		Total: t,
-	}
+	}, nil
 }
 
 func SelectMenu(id string) (string, error) {
-	if v, ok := menu[id]; ok {
+	if v, ok := dummy.Menu[id]; ok {
 		return v, nil
 	}
 
