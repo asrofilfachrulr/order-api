@@ -103,3 +103,33 @@ func TestDuplicateIdAppendOrder(t *testing.T) {
 	assert.Nil(t, first)
 	assert.EqualError(t, second, "Order id: "+co.Id+" existed")
 }
+
+func TestGetListOrder(t *testing.T) {
+	var items1 []model.Item = []model.Item{
+		{Qty: 2, Food: model.Food{Id: "mg001"}},
+		{Qty: 3, Food: model.Food{Id: "mk001"}},
+	}
+	order1, _ := MakeOrder(items1)
+	inmemory.ListOrderRuntime.AppendOrder(order1)
+
+	var items2 []model.Item = []model.Item{
+		{Qty: 1, Food: model.Food{Id: "mg002"}},
+		{Qty: 1, Food: model.Food{Id: "mk002"}},
+	}
+	order2, _ := MakeOrder(items2)
+	order2.IsPaid = true
+	inmemory.ListOrderRuntime.AppendOrder(order2)
+
+	var items3 []model.Item = []model.Item{
+		{Qty: 7, Food: model.Food{Id: "mg001"}},
+	}
+	order3, _ := MakeOrder(items3)
+	inmemory.ListOrderRuntime.AppendOrder(order3)
+
+	log.Println(inmemory.ListOrderRuntime.ListOrder)
+
+	// Items = 3, Paid = 1, Unpaid = 2
+	assert.Equal(t, GetListOrder(model.All).Length(), 3)
+	assert.Equal(t, GetListOrder(model.Unpaid).Length(), 2)
+	assert.Equal(t, GetListOrder(model.Paid).Length(), 1)
+}

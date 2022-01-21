@@ -3,6 +3,7 @@ package controller
 import (
 	"math/rand"
 	"san_dong/dummy"
+	"san_dong/inmemory"
 	"san_dong/model"
 	"san_dong/validator"
 	"strconv"
@@ -46,14 +47,6 @@ func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
 	}, nil
 }
 
-type PaidStatus string
-
-const (
-	All    PaidStatus = "All"
-	Paid   PaidStatus = "Paid"
-	Unpaid PaidStatus = "Unpaid"
-)
-
-func GetListOrder(ps PaidStatus) *model.ListOrder {
-	return nil
+func GetListOrder(ps model.PaidStatus) *model.ListOrder {
+	return inmemory.ListOrderRuntime.FilterListOrder(ps)
 }

@@ -7,3 +7,11 @@ type CompleteOrder struct {
 	IsPaid bool
 	Code   string
 }
+
+type PaidStatus string
+
+const (
+	All    PaidStatus = "All"
+	Paid   PaidStatus = "Paid"
+	Unpaid PaidStatus = "Unpaid"
+)
