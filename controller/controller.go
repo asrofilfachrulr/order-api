@@ -1,10 +1,8 @@
 package controller
 
 import (
-	"errors"
 	"math/rand"
 	"san_dong/dummy"
-	"san_dong/inmemory"
 	"san_dong/model"
 	"san_dong/validator"
 	"strconv"
@@ -48,27 +46,14 @@ func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
 	}, nil
 }
 
-/*
-*	Take created CompleteOrder send (add) to runtime object
-*	which is ListOrder to provide shareable information
-*	with cashier
-*
- */
+type PaidStatus string
 
-func contain(order model.CompleteOrder, listorder model.ListOrder) bool {
-	for _, lo := range listorder.ListOrder {
-		if lo.Id == order.Id {
-			return true
-		}
-	}
-	return false
-}
+const (
+	All    PaidStatus = "All"
+	Paid   PaidStatus = "Paid"
+	Unpaid PaidStatus = "Unpaid"
+)
 
-func FinishOrder(order *model.CompleteOrder) error {
-	if contain(*order, inmemory.ListOrderRuntime) {
-		return errors.New("Order id: " + order.Id + " existed")
-	}
-	inmemory.ListOrderRuntime.ListOrder = append(inmemory.ListOrderRuntime.ListOrder, *order)
-
+func GetListOrder(ps PaidStatus) *model.ListOrder {
 	return nil
 }

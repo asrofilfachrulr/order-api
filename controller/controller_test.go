@@ -41,14 +41,14 @@ func TestIncorrectOrder(t *testing.T) {
 	assert.EqualError(t, err, "error: invalid quantity (-1), invalid id (iAm aN InvAlIId IDD)")
 }
 
-func TestFinishOrder(t *testing.T) {
+func TestAppendOrder(t *testing.T) {
 	var items []model.Item = []model.Item{
 		{Qty: 2, Food: model.Food{Id: "mg001"}},
 		{Qty: 3, Food: model.Food{Id: "mk001"}},
 	}
 	o, _ := MakeOrder(items)
 
-	FinishOrder(o)
+	inmemory.ListOrderRuntime.AppendOrder(o)
 	log.Println(inmemory.ListOrderRuntime)
 
 	// ListOrderRuntime should have an item right now
@@ -58,26 +58,26 @@ func TestFinishOrder(t *testing.T) {
 	assert.Equal(t, inmemory.ListOrderRuntime.ListOrder[0], *o)
 }
 
-func TestMultipleFinishOrder(t *testing.T) {
+func TestMultipleAppendOrder(t *testing.T) {
 	var items1 []model.Item = []model.Item{
 		{Qty: 2, Food: model.Food{Id: "mg001"}},
 		{Qty: 3, Food: model.Food{Id: "mk001"}},
 	}
 	order1, _ := MakeOrder(items1)
-	FinishOrder(order1)
+	inmemory.ListOrderRuntime.AppendOrder(order1)
 
 	var items2 []model.Item = []model.Item{
 		{Qty: 1, Food: model.Food{Id: "mg002"}},
 		{Qty: 1, Food: model.Food{Id: "mk002"}},
 	}
 	order2, _ := MakeOrder(items2)
-	FinishOrder(order2)
+	inmemory.ListOrderRuntime.AppendOrder(order2)
 
 	var items3 []model.Item = []model.Item{
 		{Qty: 7, Food: model.Food{Id: "mg001"}},
 	}
 	order3, _ := MakeOrder(items3)
-	FinishOrder(order3)
+	inmemory.ListOrderRuntime.AppendOrder(order3)
 
 	log.Println(inmemory.ListOrderRuntime)
 
@@ -90,15 +90,15 @@ func TestMultipleFinishOrder(t *testing.T) {
 	assert.Equal(t, inmemory.ListOrderRuntime.ListOrder[2], *order3)
 }
 
-func TestDuplicateIdFinishOrder(t *testing.T) {
+func TestDuplicateIdAppendOrder(t *testing.T) {
 	var items []model.Item = []model.Item{
 		{Qty: 1, Food: model.Food{Id: "mg002"}},
 		{Qty: 1, Food: model.Food{Id: "mk002"}},
 	}
 
 	co, _ := MakeOrder(items)
-	first := FinishOrder(co)
-	second := FinishOrder(co)
+	first := inmemory.ListOrderRuntime.AppendOrder(co)
+	second := inmemory.ListOrderRuntime.AppendOrder(co)
 
 	assert.Nil(t, first)
 	assert.EqualError(t, second, "Order id: "+co.Id+" existed")
