@@ -50,3 +50,5 @@ func MakeOrder(item []model.Item) (*model.CompleteOrder, error) {
 func GetListOrder(ps model.PaidStatus) *model.ListOrder {
 	return inmemory.ListOrderRuntime.FilterListOrder(ps)
 }
+
+func PayOrder() {}
