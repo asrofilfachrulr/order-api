@@ -1,0 +1,75 @@
+swagger: "2.0"
+info:
+  description: "Order API is simple transaction generation service, allowing user generate and group customer's order seamlessly"
+  version: "0.1.1"
+  title: "Order API"
+  contact:
+    email: "riidloa@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost"
+basePath: "/api/v1"
+tags:
+- name: "order"
+  description: "Everything about single order"
+schemes:
+- "http"
+paths:
+  /order:
+    post:
+      tags:
+      - "order"
+      summary: "Add a new order to the order table"
+      description: "this request is stateless, every request is given unique"
+      operationId: "addOrder"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Order object that needs to be added to the order table"
+        required: true
+        schema:
+          $ref: "#/definitions/Order"
+      responses:
+        "405":
+          description: "Invalid input"
+
+definitions:
+  MenuItem:
+    type: "object"
+    properties:
+      menuId:
+        type: "string"
+        default: "menu-joifv87"
+      qty:
+        type: "integer"
+        format: "int8"
+        default: "3"
+  Order:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        default: "order-ivhif987dsv"
+      item:
+        type: "array"
+        items:
+          $ref: "#/definitions/MenuItem"
+      orderCreated:
+        type: "string"
+        format: "date-time"
+      status:
+        type: "string"
+        description: "Order Status"
+        enum:
+        - "unpaid"
+        - "conflict"
+        - "paid"
+      total:
+        type: "integer"
+        format: "int64"
+        default: "123700"
