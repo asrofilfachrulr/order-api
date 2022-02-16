@@ -39,7 +39,7 @@ paths:
           description: "Invalid input"
 
 definitions:
-  MenuItem:
+  OrderItem:
     type: "object"
     properties:
       menuId:
@@ -55,20 +55,16 @@ definitions:
       id:
         type: "string"
         default: "order-ivhif987dsv"
-      item:
+      items:
         type: "array"
-        items:
-          $ref: "#/definitions/MenuItem"
-      orderCreated:
+        item:
+          $ref: "#/definitions/OrderItem"
+      createdAt:
         type: "string"
         format: "date-time"
       status:
         type: "string"
         description: "Order Status"
-        enum:
-        - "unpaid"
-        - "conflict"
-        - "paid"
       total:
         type: "integer"
         format: "int64"

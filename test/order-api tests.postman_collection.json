@@ -1,0 +1,92 @@
+{
+	"info": {
+		"_postman_id": "2b40b70c-31f8-4247-9acc-4ec94b7b3635",
+		"name": "order-api tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/order",
+			"item": [
+				{
+					"name": "POST  with Correct Request Body",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"order-1\",\r\n    \"items\": [\r\n        {\r\n            \"menuId\": \"menu-1\",\r\n            \"qty\": 2\r\n        },\r\n        {\r\n            \"menuId\": \"menu-2\",\r\n            \"qty\": 1\r\n        },\r\n        {\r\n            \"menuId\": \"menu-3\",\r\n            \"qty\": 0\r\n        }\r\n    ],\r\n    \"status\": \"paid\",\r\n    \"total\": 129000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/order",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST with Empty Request Body",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/order",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST with Invalid Status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"order-1\",\r\n    \"items\": [\r\n        {\r\n            \"menuId\": \"menu-39e\",\r\n            \"qty\": 2\r\n        },\r\n        {\r\n            \"menuId\": \"menu-31a\",\r\n            \"qty\": 1\r\n        },\r\n        {\r\n            \"menuId\": \"menu-24\",\r\n            \"qty\": 0\r\n        }\r\n    ],\r\n    \"status\": \"give your dog some code\",\r\n    \"total\": 129000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/order",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"order"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
