@@ -1,6 +1,6 @@
 package model
 
 type OrderItem struct {
-	MenuId string `json:"menuId"`
-	Qty    int8   `json:"qty"`
+	MenuId int  `json:"menuId"`
+	Qty    int8 `json:"qty"`
 }

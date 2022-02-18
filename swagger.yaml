@@ -13,6 +13,8 @@ basePath: "/api/v1"
 tags:
 - name: "order"
   description: "Everything about single order"
+- name: "order/{orderId}"
+  description: "Operation with single order"
 schemes:
 - "http"
 paths:
@@ -37,6 +39,24 @@ paths:
       responses:
         "405":
           description: "Invalid input"
+  /order/{orderId}:
+    get:
+      tags:
+      - "order/{orderId}"
+      summary: "Get an order by id"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "orderId"
+        description: "Unique Id order object that has been generated upon creation"
+        required: true
+        type: "string"
+      responses:
+        "404":
+          description: "Not Found"
 
 definitions:
   OrderItem:
@@ -55,16 +75,20 @@ definitions:
       id:
         type: "string"
         default: "order-ivhif987dsv"
-      items:
+      orderitem:
         type: "array"
-        item:
+        items:
           $ref: "#/definitions/OrderItem"
-      createdAt:
+      orderCreated:
         type: "string"
         format: "date-time"
       status:
         type: "string"
         description: "Order Status"
+        enum:
+        - "unpaid"
+        - "conflict"
+        - "paid"
       total:
         type: "integer"
         format: "int64"

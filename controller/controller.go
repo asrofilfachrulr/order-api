@@ -4,11 +4,23 @@ import (
 	"errors"
 	"orderapi/inmemory"
 	"orderapi/model"
+	"orderapi/service"
+	"strconv"
 	"time"
 )
 
+type Controller struct {
+	Service *service.Service
+}
+
+func NewController(s *service.Service) *Controller {
+	return &Controller{
+		Service: s,
+	}
+}
+
 // /order
-func MakeOrder(o *model.Order) (*model.Response, error) {
+func (c *Controller) MakeOrder(o *model.Order) (*model.Response, error) {
 	// add (or maybe reset for safety) timestamp for every make order request
 	o.CreatedAt = time.Now()
 	// ensure that status must be unpaid
@@ -16,10 +28,10 @@ func MakeOrder(o *model.Order) (*model.Response, error) {
 	// calculate manually the total
 	total := 0
 	for _, item := range o.Items {
-		if _, f := inmemory.ListMenuRuntime[item.MenuId]; !f {
-			return nil, errors.New("menuId " + item.MenuId + " not found")
+		if _, f := inmemory.ListMenuInmemory[item.MenuId]; !f {
+			return nil, errors.New("menuId " + strconv.Itoa(item.MenuId) + " not found")
 		}
-		total += inmemory.ListMenuRuntime[item.MenuId] * int(item.Qty)
+		total += inmemory.ListMenuInmemory[item.MenuId] * int(item.Qty)
 	}
 	o.Total = int64(total)
 

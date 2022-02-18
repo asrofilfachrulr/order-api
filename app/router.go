@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(h *handler.HandleFunc) *gin.Engine {
+func NewRouter(h *handler.Handler) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
