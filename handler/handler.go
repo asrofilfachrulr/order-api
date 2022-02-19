@@ -1,32 +1,52 @@
 package handler
 
 import (
+	"log"
 	"orderapi/controller"
+	"orderapi/exception"
+	"orderapi/helper"
 	"orderapi/model"
-	"orderapi/util"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type Handler struct {
 	Controller *controller.Controller
+	Validate   *validator.Validate
 }
 
-func NewHandler(c *controller.Controller) *Handler {
+func NewHandler(c *controller.Controller, v *validator.Validate) *Handler {
 	return &Handler{
 		Controller: c,
+		Validate:   v,
+	}
+}
+
+func EmptyRecover() {
+	if r := recover(); r != nil {
+		log.Printf("recovered from error [%s]", r)
 	}
 }
 
 // Order
 func (h *Handler) PostOrder(c *gin.Context) {
-	jsonData, err := (&model.Order{}).ParseJSON(c.Request.Body)
-	util.BadInputErrorResp(err, c)
+	defer EmptyRecover()
+	OrderStruct, err := (&model.Order{}).ParseJSON(c.Request.Body)
+	exception.BadRequestError(c, err)
 
-	resp, err := h.Controller.MakeOrder(&jsonData)
-	util.BadInputErrorResp(err, c)
+	log.Println(OrderStruct)
 
-	c.JSON(200, resp)
+	err = h.Validate.Struct(OrderStruct)
+	exception.BadRequestError(c, err)
+
+	h.Controller.MakeOrder(c, &OrderStruct)
+
+	c.JSON(201, gin.H{
+		"status":  "success",
+		"message": "succeed register new order",
+		"data":    helper.ToOrderResponse(&OrderStruct),
+	})
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
 	// TODO: implement this are you kidding me for 2000 bucks

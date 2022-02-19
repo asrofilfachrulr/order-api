@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"orderapi/app"
 	"orderapi/controller"
+	"orderapi/exception"
 	"orderapi/handler"
-	"orderapi/inmemory"
 	"orderapi/service"
-	"orderapi/util"
+
+	"github.com/go-playground/validator/v10"
 )
 
 func main() {
@@ -15,14 +15,15 @@ func main() {
 
 	m := service.NewMenuService(db)
 	err := m.LoadMenu()
-	util.ExitIfError(err)
+	exception.TerminateRuntimeIfError(err)
 
 	s := service.NewOrderService(db)
 	c := controller.NewController(s)
-	h := handler.NewHandler(c)
+	v := validator.New()
+	h := handler.NewHandler(c, v)
 	r := app.NewRouter(h)
 
-	fmt.Println(inmemory.ListMenuInmemory)
+	// fmt.Println(inmemory.ListMenuInmemory)
 
 	r.Run()
 }

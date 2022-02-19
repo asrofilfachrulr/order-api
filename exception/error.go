@@ -1,35 +1,67 @@
 package exception
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 )
 
-func BadRequestError(c *gin.Context, err error) {
-	if err == nil {
+func TerminateRuntimeIfError(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
+func BadRequestError(c *gin.Context, ers ...error) {
+	var msg error
+	if ers[0] == nil {
 		return
 	}
+
+	if len(ers) > 1 {
+		msg = ers[1]
+	} else {
+		msg = ers[0]
+	}
 	c.AbortWithStatusJSON(400, gin.H{
-		"status":  "Bad Request",
-		"message": err.Error(),
+		"status":  "Error: Bad Request",
+		"message": msg.Error(),
 	})
-	panic(err)
-	// c.JSON(400, gin.H{
-	// 	"status":  "Bad Request",
-	// 	"message": err.Error(),
-	// })
-	// <-c.Request.Context().Done()
+	panic(msg)
 }
 
-func NotFoundError(c *gin.Context, err error) {
+func NotFoundError(c *gin.Context, ers ...error) {
+	var msg error
+	if ers[0] == nil {
+		return
+	}
+
+	if len(ers) > 1 {
+		msg = ers[1]
+	} else {
+		msg = ers[0]
+	}
 	c.JSON(404, gin.H{
-		"status":  "Not found",
-		"message": err.Error(),
+		"status":  "Error: Not found",
+		"message": msg.Error(),
 	})
+	panic(msg)
 }
 
-func InternalServerError(c *gin.Context, err error) {
+func InternalServerError(c *gin.Context, ers ...error) {
+	var msg error
+	if ers[0] == nil {
+		return
+	}
+
+	if len(ers) > 1 {
+		msg = ers[1]
+	} else {
+		msg = ers[0]
+	}
 	c.JSON(500, gin.H{
-		"status":  "Internal Error",
-		"message": err.Error(),
+		"status":  "Error: Internal Error",
+		"message": msg.Error(),
 	})
+	panic(msg)
 }

@@ -2,7 +2,7 @@ package controller
 
 import (
 	"errors"
-	"log"
+	"orderapi/exception"
 	"orderapi/inmemory"
 	"orderapi/model"
 	"orderapi/service"
@@ -24,7 +24,12 @@ func NewController(s *service.OrderService) *Controller {
 }
 
 // /order
-func (c *Controller) MakeOrder(o *model.Order) (gin.H, error) {
+func (c *Controller) MakeOrder(ctx *gin.Context, o *model.Order) {
+	// order items cannot be empty
+	if len(o.Items) == 0 {
+		exception.BadRequestError(ctx, errors.New("cannot register new order due order items is zero"))
+	}
+
 	// generate unique id
 	id, _ := nanoid.New()
 	o.Id = "order-" + id
@@ -36,24 +41,17 @@ func (c *Controller) MakeOrder(o *model.Order) (gin.H, error) {
 	// calculate manually the total
 	total := 0
 	for _, item := range o.Items {
+		if item.Qty < 1 {
+			exception.BadRequestError(ctx, errors.New("item's quantity must be at least 1"))
+		}
 		if _, f := inmemory.ListMenuInmemory[item.MenuId]; !f {
-			return nil, errors.New("menuId " + strconv.Itoa(item.MenuId) + " not found")
+			exception.BadRequestError(ctx, errors.New("Menu "+strconv.Itoa(item.MenuId)+" not found"))
+			return
+
 		}
 		total += inmemory.ListMenuInmemory[item.MenuId] * int(item.Qty)
 	}
 	o.Total = int64(total)
 
-	log.Println(o)
-
-	err := c.Service.AddOrder(o)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return gin.H{
-		"status":  "success",
-		"message": "succeed register your order",
-		"id":      o.Id,
-	}, nil
+	c.Service.AddOrder(ctx, o)
 }
