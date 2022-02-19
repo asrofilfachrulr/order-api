@@ -5,6 +5,9 @@ import (
 )
 
 func BadRequestError(c *gin.Context, err error) {
+	if err == nil {
+		return
+	}
 	c.AbortWithStatusJSON(400, gin.H{
 		"status":  "Bad Request",
 		"message": err.Error(),
