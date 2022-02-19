@@ -2,25 +2,33 @@ package controller
 
 import (
 	"errors"
+	"log"
 	"orderapi/inmemory"
 	"orderapi/model"
 	"orderapi/service"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type Controller struct {
-	Service *service.Service
+	Service *service.OrderService
 }
 
-func NewController(s *service.Service) *Controller {
+func NewController(s *service.OrderService) *Controller {
 	return &Controller{
 		Service: s,
 	}
 }
 
 // /order
-func (c *Controller) MakeOrder(o *model.Order) (*model.Response, error) {
+func (c *Controller) MakeOrder(o *model.Order) (gin.H, error) {
+	// generate unique id
+	id, _ := nanoid.New()
+	o.Id = "order-" + id
+
 	// add (or maybe reset for safety) timestamp for every make order request
 	o.CreatedAt = time.Now()
 	// ensure that status must be unpaid
@@ -35,9 +43,17 @@ func (c *Controller) MakeOrder(o *model.Order) (*model.Response, error) {
 	}
 	o.Total = int64(total)
 
-	return &model.Response{
-		Status:  "success",
-		Message: "success add new order",
-		Data:    *o,
+	log.Println(o)
+
+	err := c.Service.AddOrder(o)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return gin.H{
+		"status":  "success",
+		"message": "succeed register your order",
+		"id":      o.Id,
 	}, nil
 }

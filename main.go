@@ -12,13 +12,15 @@ import (
 
 func main() {
 	db := app.NewDB()
-	s := service.NewService(db)
+
+	m := service.NewMenuService(db)
+	err := m.LoadMenu()
+	util.ExitIfError(err)
+
+	s := service.NewOrderService(db)
 	c := controller.NewController(s)
 	h := handler.NewHandler(c)
 	r := app.NewRouter(h)
-
-	err := s.LoadMenu()
-	util.ExitIfError(err)
 
 	fmt.Println(inmemory.ListMenuInmemory)
 

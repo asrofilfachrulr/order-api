@@ -6,20 +6,20 @@ import (
 	"orderapi/model"
 )
 
-type Service struct {
+type MenuService struct {
 	DB *sql.DB
 }
 
-func NewService(db *sql.DB) *Service {
-	return &Service{
+func NewMenuService(db *sql.DB) *MenuService {
+	return &MenuService{
 		DB: db,
 	}
 }
 
-func (s *Service) LoadMenu() error {
+func (ms *MenuService) LoadMenu() error {
 	q := "SELECT * FROM menu_list"
 
-	rows, err := s.DB.Query(q)
+	rows, err := ms.DB.Query(q)
 
 	if err != nil {
 		return err

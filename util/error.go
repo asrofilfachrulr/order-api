@@ -21,7 +21,7 @@ func ExitIfError(e error) {
 
 func BadInputErrorResp(e error, c *gin.Context) {
 	if e != nil {
-		c.JSON(405, model.Response{
+		c.JSON(400, model.BasicResponse{
 			Status:  "Bad Input",
 			Message: e.Error(),
 		})
@@ -30,7 +30,7 @@ func BadInputErrorResp(e error, c *gin.Context) {
 
 func InternalErrorResp(e error, c *gin.Context) {
 	if e != nil {
-		c.JSON(500, model.Response{
+		c.JSON(500, model.BasicResponse{
 			Status:  "Internal Error",
 			Message: e.Error(),
 		})

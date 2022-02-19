@@ -23,10 +23,10 @@ func (h *Handler) PostOrder(c *gin.Context) {
 	jsonData, err := (&model.Order{}).ParseJSON(c.Request.Body)
 	util.BadInputErrorResp(err, c)
 
-	resp, err := h.Controller.MakeOrder(jsonData)
-	util.InternalErrorResp(err, c)
+	resp, err := h.Controller.MakeOrder(&jsonData)
+	util.BadInputErrorResp(err, c)
 
-	c.JSON(200, *resp)
+	c.JSON(200, resp)
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
 	// TODO: implement this are you kidding me for 2000 bucks

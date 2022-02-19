@@ -15,16 +15,18 @@ type Order struct {
 	Total     int64       `json:"total"`
 }
 
-func (o *Order) ParseJSON(i io.ReadCloser) (*Order, error) {
+func (o *Order) ParseJSON(i io.ReadCloser) (Order, error) {
 	jsonByte, err := ioutil.ReadAll(i)
 	if err != nil {
-		return nil, err
+		return Order{}, err
 	}
 
-	err = json.Unmarshal(jsonByte, o)
+	newOrder := Order{}
+
+	err = json.Unmarshal(jsonByte, &newOrder)
 	if err != nil {
-		return nil, err
+		return Order{}, err
 	}
 
-	return o, nil
+	return newOrder, nil
 }
