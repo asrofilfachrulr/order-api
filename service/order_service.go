@@ -19,7 +19,7 @@ func NewOrderService(db *sql.DB) *OrderService {
 }
 
 func (o *OrderService) AddOrder(c *gin.Context, order *model.Order) {
-	q := "INSERT INTO order_list VALUES(?, ?, ?, ?)"
+	q := "INSERT INTO order_list VALUES($1, $2, $3, $4)"
 	_, err := o.DB.Exec(q, order.Id, order.CreatedAt, order.Status, order.Total)
 
 	if err != nil {
@@ -28,7 +28,7 @@ func (o *OrderService) AddOrder(c *gin.Context, order *model.Order) {
 	}
 
 	for _, item := range order.Items {
-		q = "INSERT INTO order_item VALUES(?, ?, ?)"
+		q = "INSERT INTO order_item VALUES($1, $2, $3)"
 		_, err := o.DB.Exec(q, order.Id, item.MenuId, item.Qty)
 
 		if err != nil {
