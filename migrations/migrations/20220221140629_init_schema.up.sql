@@ -14,7 +14,7 @@ VALUES
     ('tahu telor', 9000),
     ('nasi goreng', 12000),
     ('nasi campur', 8000),
-    ('soto', 10000);
+    ('soto ayam', 10000);
 
 -- Create table of list of regeistered order
 CREATE TABLE order_list (

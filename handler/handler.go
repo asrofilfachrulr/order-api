@@ -50,8 +50,12 @@ func (h *Handler) PostOrder(c *gin.Context) {
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
 	// TODO: implement this are you kidding me for 2000 bucks
+	orderStruct := &model.Order{}
+
 	c.JSON(200, gin.H{
-		"message": "You're at GetOrderById by id =" + c.Param("orderId"),
+		"status":  "success",
+		"message": "Success retrieve order " + c.Param("orderId"),
+		"data":    *orderStruct,
 	})
 }
 func (h *Handler) PutOrderById(c *gin.Context) {

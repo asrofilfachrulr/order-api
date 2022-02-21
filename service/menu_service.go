@@ -27,15 +27,18 @@ func (ms *MenuService) LoadMenu() error {
 
 	for rows.Next() {
 		m := model.Menu{}
-		var temp string
 
-		err := rows.Scan(&m.Id, &temp, &m.Price)
+		err := rows.Scan(&m.Id, &m.Name, &m.Price)
 
 		if err != nil {
 			return err
 		}
 
-		inmemory.ListMenuInmemory[m.Id] = m.Price
+		inmemory.ListMenuInmemory[m.Id] = &inmemory.MenuInfoById{
+			Price: m.Price,
+			Name:  m.Name,
+		}
+		delete(inmemory.ListMenuInmemory, 0)
 	}
 	return nil
 }

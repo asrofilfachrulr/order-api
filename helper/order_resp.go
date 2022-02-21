@@ -9,3 +9,9 @@ func ToOrderResponse(o *model.Order) *model.OrderResp {
 		Total:     o.Total,
 	}
 }
+
+// func ToDetailedOrderResponse(o *model.Order) *model.OrderDetailResp {
+// 	for i, item := range o.Items {
+// 		item.
+// 	}
+// }

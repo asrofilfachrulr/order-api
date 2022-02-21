@@ -33,7 +33,9 @@ func main() {
 	// router
 	r := app.NewRouter(h)
 
-	fmt.Println(inmemory.ListMenuInmemory)
-
+	fmt.Println("Load Menu..")
+	for i, item := range inmemory.ListMenuInmemory {
+		fmt.Printf("%d\t%s\t%d\n", i, item.Name, item.Price)
+	}
 	r.Run()
 }

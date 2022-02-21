@@ -32,7 +32,7 @@ func (c *Controller) MakeOrder(ctx *gin.Context, o *model.Order) {
 
 	// generate unique id
 	id, _ := nanoid.New()
-	o.Id = "order-" + id
+	o.Id = id
 
 	// add (or maybe reset for safety) timestamp for every make order request
 	o.CreatedAt = time.Now()
@@ -49,9 +49,13 @@ func (c *Controller) MakeOrder(ctx *gin.Context, o *model.Order) {
 			return
 
 		}
-		total += inmemory.ListMenuInmemory[item.MenuId] * int(item.Qty)
+		total += inmemory.ListMenuInmemory[item.MenuId].Price * int(item.Qty)
 	}
 	o.Total = int64(total)
 
 	c.Service.AddOrder(ctx, o)
+}
+
+func (c *Controller) GetOrderById(ctx *gin.Context, o *model.Order) {
+
 }

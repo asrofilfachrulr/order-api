@@ -1,5 +1,10 @@
 package inmemory
 
-var ListMenuInmemory = map[int]int{
-	0: 0,
+type MenuInfoById struct {
+	Price int
+	Name  string
+}
+
+var ListMenuInmemory = map[int]*MenuInfoById{
+	0: {Price: 0, Name: ""},
 }

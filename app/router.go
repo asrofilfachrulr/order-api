@@ -19,9 +19,9 @@ func NewRouter(h *handler.Handler) *gin.Engine {
 	{
 		order := v1.Group("/order")
 		{
+			order.POST("/", h.PostOrder)
 			order.GET("/:orderId", h.GetOrderById)
 			order.PUT("/:orderId", h.PutOrderById)
-			order.POST("/", h.PostOrder)
 			order.DELETE("/:orderId", h.DeleteOrderById)
 		}
 
