@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS menu_list;
+ALTER TABLE IF EXISTS order_item DROP CONSTRAINT fk_order_id;
+DROP TABLE IF EXISTS order_item;
+DROP TABLE IF EXISTS order_list;
