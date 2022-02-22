@@ -33,14 +33,21 @@ func EmptyRecover() {
 func (h *Handler) PostOrder(c *gin.Context) {
 	defer EmptyRecover()
 	OrderStruct, err := (&model.Order{}).ParseJSON(c.Request.Body)
-	exception.BadRequestError(c, err)
+	if err != nil {
+		exception.RespondWithBadRequestError(c, err)
+	}
 
 	log.Println(OrderStruct)
 
 	err = h.Validate.Struct(OrderStruct)
-	exception.BadRequestError(c, err)
+	if err != nil {
+		exception.RespondWithBadRequestError(c, err)
+	}
 
-	h.Controller.MakeOrder(c, &OrderStruct)
+	e := h.Controller.MakeOrder(&OrderStruct)
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
 
 	c.JSON(201, gin.H{
 		"status":  "success",
@@ -49,8 +56,9 @@ func (h *Handler) PostOrder(c *gin.Context) {
 	})
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
-	// TODO: implement this are you kidding me for 2000 bucks
+	defer EmptyRecover()
 	orderStruct := &model.Order{}
+	h.Controller.GetOrderById(orderStruct)
 
 	c.JSON(200, gin.H{
 		"status":  "success",

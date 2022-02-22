@@ -2,9 +2,24 @@ package exception
 
 import (
 	"log"
+	berror "orderapi/error" // built in error
 
 	"github.com/gin-gonic/gin"
 )
+
+func CheckCaseErrorThenRespond(c *gin.Context, e berror.Error) {
+	switch e.(type) {
+	case *berror.BadRequestError:
+		RespondWithBadRequestError(c, e.GetError())
+	case *berror.NotFoundError:
+		RespondWithNotFoundError(c, e.GetError())
+	case *berror.InternalServerError:
+		RespondWithInternalServerError(c, e.GetError())
+	default:
+		panic(e) // terminate current handler flow
+	}
+
+}
 
 func TerminateRuntimeIfError(e error) {
 	if e != nil {
@@ -12,56 +27,28 @@ func TerminateRuntimeIfError(e error) {
 	}
 }
 
-func BadRequestError(c *gin.Context, ers ...error) {
-	var msg error
-	if ers[0] == nil {
-		return
-	}
-
-	if len(ers) > 1 {
-		msg = ers[1]
-	} else {
-		msg = ers[0]
-	}
+func RespondWithBadRequestError(c *gin.Context, e error) {
 	c.AbortWithStatusJSON(400, gin.H{
 		"status":  "Error: Bad Request",
-		"message": msg.Error(),
+		"message": e.Error(),
 	})
-	panic(msg)
+	panic(e) // terminate current handler flow
 }
 
-func NotFoundError(c *gin.Context, ers ...error) {
-	var msg error
-	if ers[0] == nil {
-		return
-	}
+func RespondWithNotFoundError(c *gin.Context, e error) {
 
-	if len(ers) > 1 {
-		msg = ers[1]
-	} else {
-		msg = ers[0]
-	}
 	c.JSON(404, gin.H{
 		"status":  "Error: Not found",
-		"message": msg.Error(),
+		"message": e.Error(),
 	})
-	panic(msg)
+	panic(e) // terminate current handler flow
 }
 
-func InternalServerError(c *gin.Context, ers ...error) {
-	var msg error
-	if ers[0] == nil {
-		return
-	}
+func RespondWithInternalServerError(c *gin.Context, e error) {
 
-	if len(ers) > 1 {
-		msg = ers[1]
-	} else {
-		msg = ers[0]
-	}
 	c.JSON(500, gin.H{
 		"status":  "Error: Internal Error",
-		"message": msg.Error(),
+		"message": e.Error(),
 	})
-	panic(msg)
+	panic(e) // terminate current handler flow
 }

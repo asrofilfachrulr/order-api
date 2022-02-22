@@ -2,10 +2,8 @@ package service
 
 import (
 	"database/sql"
-	"orderapi/exception"
+	"orderapi/error"
 	"orderapi/model"
-
-	"github.com/gin-gonic/gin"
 )
 
 type OrderService struct {
@@ -18,13 +16,12 @@ func NewOrderService(db *sql.DB) *OrderService {
 	}
 }
 
-func (o *OrderService) AddOrder(c *gin.Context, order *model.Order) {
+func (o *OrderService) AddOrder(order *model.Order) error.Error {
 	q := "INSERT INTO order_list VALUES($1, $2, $3, $4)"
 	_, err := o.DB.Exec(q, order.Id, order.CreatedAt, order.Status, order.Total)
 
 	if err != nil {
-		exception.InternalServerError(c, err)
-		return
+		return &error.InternalServerError{Err: err}
 	}
 
 	for _, item := range order.Items {
@@ -32,8 +29,8 @@ func (o *OrderService) AddOrder(c *gin.Context, order *model.Order) {
 		_, err := o.DB.Exec(q, order.Id, item.MenuId, item.Qty)
 
 		if err != nil {
-			exception.InternalServerError(c, err)
-			return
+			return &error.InternalServerError{Err: err}
 		}
 	}
+	return nil
 }

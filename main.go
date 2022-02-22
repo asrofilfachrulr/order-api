@@ -10,7 +10,6 @@ import (
 	"orderapi/service"
 
 	"github.com/go-playground/validator/v10"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {

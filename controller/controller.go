@@ -2,14 +2,13 @@ package controller
 
 import (
 	"errors"
-	"orderapi/exception"
+	"orderapi/error"
 	"orderapi/inmemory"
 	"orderapi/model"
 	"orderapi/service"
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -24,10 +23,10 @@ func NewController(s *service.OrderService) *Controller {
 }
 
 // /order
-func (c *Controller) MakeOrder(ctx *gin.Context, o *model.Order) {
+func (c *Controller) MakeOrder(o *model.Order) error.Error {
 	// order items cannot be empty
 	if len(o.Items) == 0 {
-		exception.BadRequestError(ctx, errors.New("cannot register new order due order items is zero"))
+		return &error.BadRequestError{Err: errors.New("cannot register new order due order items is zero")}
 	}
 
 	// generate unique id
@@ -42,20 +41,21 @@ func (c *Controller) MakeOrder(ctx *gin.Context, o *model.Order) {
 	total := 0
 	for _, item := range o.Items {
 		if item.Qty < 1 {
-			exception.BadRequestError(ctx, errors.New("item's quantity must be at least 1"))
+			return &error.BadRequestError{Err: errors.New("item's quantity must be at least 1")}
 		}
 		if _, f := inmemory.ListMenuInmemory[item.MenuId]; !f {
-			exception.BadRequestError(ctx, errors.New("Menu "+strconv.Itoa(item.MenuId)+" not found"))
-			return
+			return &error.BadRequestError{Err: errors.New("Menu " + strconv.Itoa(item.MenuId) + " not found")}
 
 		}
 		total += inmemory.ListMenuInmemory[item.MenuId].Price * int(item.Qty)
 	}
 	o.Total = int64(total)
 
-	c.Service.AddOrder(ctx, o)
+	c.Service.AddOrder(o)
+	return nil
 }
 
-func (c *Controller) GetOrderById(ctx *gin.Context, o *model.Order) {
+func (c *Controller) GetOrderById(o *model.Order) error.Error {
 
+	return nil
 }
