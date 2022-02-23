@@ -6,6 +6,7 @@ type OrderDetailResp struct {
 	Id        string                `json:"id"`
 	Items     []OrderItemDetailResp `json:"items"`
 	CreatedAt time.Time             `json:"createdAt"`
+	UpdatedAt time.Time             `json:"updatedAt"`
 	Status    string                `json:"status"`
 	Total     int64                 `json:"total"`
 }

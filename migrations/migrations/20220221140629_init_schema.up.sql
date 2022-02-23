@@ -20,6 +20,7 @@ VALUES
 CREATE TABLE order_list (
     id VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     status varchar(10) NOT NULL,
     total INT NOT NULL,
     PRIMARY KEY (id),

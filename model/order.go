@@ -11,8 +11,9 @@ type Order struct {
 	Id        string      `json:"id"`
 	Items     []OrderItem `json:"items" validate:"required,dive,required"`
 	CreatedAt time.Time   `json:"createdAt"`
-	Status    string      `json:"status"`
-	Total     int64       `json:"total"`
+	UpdatedAt time.Time
+	Status    string `json:"status"`
+	Total     int64  `json:"total"`
 }
 
 func (o *Order) ParseJSON(i io.ReadCloser) (Order, error) {

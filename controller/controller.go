@@ -6,7 +6,6 @@ import (
 	"orderapi/inmemory"
 	"orderapi/model"
 	"orderapi/service"
-	"strconv"
 	"time"
 
 	nanoid "github.com/matoous/go-nanoid/v2"
@@ -35,6 +34,7 @@ func (c *Controller) MakeOrder(o *model.Order) error.Error {
 
 	// add (or maybe reset for safety) timestamp for every make order request
 	o.CreatedAt = time.Now()
+	o.UpdatedAt = o.CreatedAt
 	// ensure that status must be unpaid
 	o.Status = "unpaid"
 	// calculate manually the total
@@ -43,11 +43,11 @@ func (c *Controller) MakeOrder(o *model.Order) error.Error {
 		if item.Qty < 1 {
 			return &error.BadRequestError{Err: errors.New("item's quantity must be at least 1")}
 		}
-		if _, f := inmemory.ListMenuInmemory[item.MenuId]; !f {
-			return &error.BadRequestError{Err: errors.New("Menu " + strconv.Itoa(item.MenuId) + " not found")}
+		if _, f := inmemory.ListMenuInmemory[item.Name]; !f {
+			return &error.BadRequestError{Err: errors.New("Menu " + item.Name + " not found")}
 
 		}
-		total += inmemory.ListMenuInmemory[item.MenuId].Price * int(item.Qty)
+		total += inmemory.ListMenuInmemory[item.Name].Price * int(item.Qty)
 	}
 	o.Total = int64(total)
 
@@ -60,9 +60,8 @@ func (c *Controller) MakeOrder(o *model.Order) error.Error {
 
 func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Error) {
 	var order *model.Order
-	var orderItem []model.OrderItem
 
-	order, orderItem, err := c.Service.GetOrderById(id)
+	order, err := c.Service.GetOrderById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -70,15 +69,16 @@ func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Erro
 	orderDetail := &model.OrderDetailResp{
 		Id:        order.Id,
 		CreatedAt: order.CreatedAt,
+		UpdatedAt: order.UpdatedAt,
 		Status:    order.Status,
 		Total:     order.Total,
 	}
 
 	var items []model.OrderItemDetailResp
-	for _, item := range orderItem {
+	for _, item := range order.Items {
 		i := model.OrderItemDetailResp{
 			Qty:  item.Qty,
-			Name: inmemory.ListMenuInmemory[item.MenuId].Name,
+			Name: item.Name,
 		}
 		items = append(items, i)
 	}
