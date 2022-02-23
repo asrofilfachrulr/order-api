@@ -51,11 +51,39 @@ func (c *Controller) MakeOrder(o *model.Order) error.Error {
 	}
 	o.Total = int64(total)
 
-	c.Service.AddOrder(o)
+	err := c.Service.AddOrder(o)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (c *Controller) GetOrderById(o *model.Order) error.Error {
+func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Error) {
+	var order *model.Order
+	var orderItem []model.OrderItem
 
-	return nil
+	order, orderItem, err := c.Service.GetOrderById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	orderDetail := &model.OrderDetailResp{
+		Id:        order.Id,
+		CreatedAt: order.CreatedAt,
+		Status:    order.Status,
+		Total:     order.Total,
+	}
+
+	var items []model.OrderItemDetailResp
+	for _, item := range orderItem {
+		i := model.OrderItemDetailResp{
+			Qty:  item.Qty,
+			Name: inmemory.ListMenuInmemory[item.MenuId].Name,
+		}
+		items = append(items, i)
+	}
+
+	orderDetail.Items = items
+
+	return orderDetail, nil
 }

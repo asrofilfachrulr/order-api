@@ -57,13 +57,16 @@ func (h *Handler) PostOrder(c *gin.Context) {
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
 	defer EmptyRecover()
-	orderStruct := &model.Order{}
-	h.Controller.GetOrderById(orderStruct)
+
+	orderDetail, e := h.Controller.GetOrderById(c.Param("orderId"))
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
 
 	c.JSON(200, gin.H{
 		"status":  "success",
 		"message": "Success retrieve order " + c.Param("orderId"),
-		"data":    *orderStruct,
+		"data":    *orderDetail,
 	})
 }
 func (h *Handler) PutOrderById(c *gin.Context) {

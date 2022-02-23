@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+	"errors"
 	"orderapi/error"
 	"orderapi/model"
 )
@@ -33,4 +34,47 @@ func (o *OrderService) AddOrder(order *model.Order) error.Error {
 		}
 	}
 	return nil
+}
+
+func (o *OrderService) GetOrderById(id string) (*model.Order, []model.OrderItem, error.Error) {
+	q := "SELECT * FROM order_list WHERE id = $1"
+	r, err := o.DB.Query(q, id)
+	if err != nil {
+		return nil, nil, &error.InternalServerError{Err: err}
+	}
+	if !r.Next() {
+		return nil, nil, &error.NotFoundError{Err: errors.New("order " + id + " not found!")}
+	}
+
+	order := model.Order{}
+	err = r.Scan(&order.Id, &order.CreatedAt, &order.Status, &order.Total)
+	if err != nil {
+		return nil, nil, &error.InternalServerError{Err: err}
+	}
+
+	q = "SELECT * FROM order_item WHERE order_id = $1"
+	r, err = o.DB.Query(q, order.Id)
+
+	if err != nil {
+		return nil, nil, &error.InternalServerError{Err: err}
+	}
+	defer r.Close()
+
+	var orderItems []model.OrderItem
+
+	for r.Next() {
+		oi := model.OrderItem{}
+		var temp string
+		err = r.Scan(&temp, &oi.MenuId, &oi.Qty)
+		if err != nil {
+			return nil, nil, &error.InternalServerError{Err: err}
+		}
+		orderItems = append(orderItems, oi)
+	}
+
+	if len(orderItems) == 0 {
+		return nil, nil, &error.InternalServerError{Err: errors.New("order item with order_id " + order.Id + " not found!")}
+	}
+
+	return &order, orderItems, nil
 }
