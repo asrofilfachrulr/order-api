@@ -29,3 +29,18 @@ func (o *Order) ParseJSON(i io.ReadCloser) (Order, error) {
 	}
 	return newOrder, nil
 }
+
+func ParseIdJSON(i io.ReadCloser) (map[string]string, error) {
+	dataByte, err := ioutil.ReadAll(i)
+	if err != nil {
+		return nil, err
+	}
+
+	var body map[string]string
+
+	err = json.Unmarshal(dataByte, &body)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
