@@ -70,9 +70,16 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 	})
 }
 func (h *Handler) PutOrderById(c *gin.Context) {
-	// TODO: implement this are you kidding me for 2000 bucks
-	c.JSON(200, gin.H{
-		"message": "You're at PutOrderById by id =" + c.Param("orderId"),
+	defer EmptyRecover()
+	err := h.Controller.UpdateOrderStatusById(c.Param("orderId"))
+
+	if err != nil {
+		exception.CheckCaseErrorThenRespond(c, err)
+	}
+
+	c.JSON(204, gin.H{
+		"status":  "success",
+		"message": "Success updating order " + c.Param("orderId"),
 	})
 }
 func (h *Handler) DeleteOrderById(c *gin.Context) {

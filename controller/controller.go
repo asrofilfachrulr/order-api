@@ -87,3 +87,11 @@ func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Erro
 
 	return orderDetail, nil
 }
+
+func (c *Controller) UpdateOrderStatusById(id string) error.Error {
+	err := c.Service.UpdateOrderStatusById(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

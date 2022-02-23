@@ -78,3 +78,16 @@ func (o *OrderService) GetOrderById(id string) (*model.Order, []model.OrderItem,
 
 	return &order, orderItems, nil
 }
+
+func (o *OrderService) UpdateOrderStatusById(id string) error.Error {
+	q := "UPDATE order_list SET status = 'paid' WHERE id = $1"
+
+	r, err := o.DB.Exec(q, id)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	if n, _ := r.RowsAffected(); n == 0 {
+		return &error.NotFoundError{Err: errors.New("orderId " + id + " not found!")}
+	}
+	return nil
+}
