@@ -24,15 +24,16 @@ func NewHandler(c *controller.Controller, v *validator.Validate) *Handler {
 	}
 }
 
-func EmptyRecover() {
+func EmptyRecover(c *gin.Context) {
 	if r := recover(); r != nil {
 		log.Printf("recovered from error [%s]", r)
+		exception.RespondWithInternalServerError(c, errors.New(r.(string)))
 	}
 }
 
 // Order
 func (h *Handler) PostOrder(c *gin.Context) {
-	defer EmptyRecover()
+	defer EmptyRecover(c)
 	OrderStruct, err := (&model.Order{}).ParseJSON(c.Request.Body)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
@@ -57,7 +58,7 @@ func (h *Handler) PostOrder(c *gin.Context) {
 	})
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
-	defer EmptyRecover()
+	defer EmptyRecover(c)
 	orderDetail, e := h.Controller.GetOrderById(c.Param("orderId"))
 	if e != nil {
 		exception.CheckCaseErrorThenRespond(c, e)
@@ -69,12 +70,14 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 	})
 }
 func (h *Handler) PutOrderById(c *gin.Context) {
-	defer EmptyRecover()
+	log.Println("Entering PutOrderById block")
+	defer EmptyRecover(c)
 	j, err := (&model.OrderUpdate{}).ParseJSON(c.Request.Body)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
 	}
 
+	h.Validate.RegisterValidation("status", model.ValidateStatus)
 	err = h.Validate.Struct(j)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
@@ -85,6 +88,7 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 		exception.RespondWithBadRequestError(c, err)
 	}
 
+	log.Println("Ending PutOrderById block")
 	c.JSON(204, gin.H{
 		"status":  "success",
 		"message": "Success updating order " + c.Param("orderId"),

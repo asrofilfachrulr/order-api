@@ -5,10 +5,12 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type OrderUpdate struct {
-	Status string      `json:"status" validate:"eq='paid'|'unpaid'|'conflict'"`
+	Status string      `json:"status" validate:"status"`
 	Items  []OrderItem `json:"items" validate:"dive"`
 }
 
@@ -42,4 +44,14 @@ func (o *OrderUpdate) ValidateMissing() error {
 	}
 
 	return nil
+}
+
+func ValidateStatus(f validator.FieldLevel) bool {
+	status := f.Field().String()
+	for _, s := range [...]string{"paid", "unpaid", "conflict"} {
+		if s == status {
+			return true
+		}
+	}
+	return false
 }
