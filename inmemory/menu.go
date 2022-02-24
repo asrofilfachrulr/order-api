@@ -1,14 +1,10 @@
 package inmemory
 
-type MenuInfoByName struct {
+type MenuInfoById struct {
 	Price int
-	Id    int
+	Name  string
 }
 
-var MenuIdNameMap = map[int]string{
-	0: "",
-}
-
-var ListMenuInmemory = map[string]*MenuInfoByName{
-	"": {},
+var ListMenuInmemory = map[int]*MenuInfoById{
+	0: {},
 }

@@ -34,7 +34,7 @@ func main() {
 
 	fmt.Println("Load Menu..")
 	for i, item := range inmemory.ListMenuInmemory {
-		fmt.Printf("%d\t%s\t%d\n", item.Id, i, item.Price)
+		fmt.Printf("%d\t%s\t%d\n", i, item.Name, item.Price)
 	}
 	r.Run()
 }

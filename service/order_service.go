@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"orderapi/error"
-	"orderapi/inmemory"
 	"orderapi/model"
 )
 
@@ -28,7 +27,7 @@ func (o *OrderService) AddOrder(order *model.Order) error.Error {
 
 	for _, item := range order.Items {
 		q = "INSERT INTO order_item VALUES($1, $2, $3)"
-		_, err := o.DB.Exec(q, order.Id, inmemory.ListMenuInmemory[item.Name].Id, item.Qty)
+		_, err := o.DB.Exec(q, order.Id, item.Id, item.Qty)
 
 		if err != nil {
 			return &error.InternalServerError{Err: err}
@@ -66,7 +65,7 @@ func (o *OrderService) GetOrderById(id string) (*model.Order, error.Error) {
 	for r.Next() {
 		oi := model.OrderItem{}
 		var temp string
-		err = r.Scan(&temp, &oi.Name, &oi.Qty)
+		err = r.Scan(&temp, &oi.Id, &oi.Qty)
 		if err != nil {
 			return nil, &error.InternalServerError{Err: err}
 		}

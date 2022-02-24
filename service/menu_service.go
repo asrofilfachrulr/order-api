@@ -34,13 +34,11 @@ func (ms *MenuService) LoadMenu() error {
 			return err
 		}
 
-		inmemory.ListMenuInmemory[m.Name] = &inmemory.MenuInfoByName{
+		inmemory.ListMenuInmemory[m.Id] = &inmemory.MenuInfoById{
 			Price: m.Price,
-			Id:    m.Id,
+			Name:  m.Name,
 		}
-		delete(inmemory.ListMenuInmemory, "")
-
-		inmemory.MenuIdNameMap[m.Id] = m.Name
+		delete(inmemory.ListMenuInmemory, 0)
 	}
 	return nil
 }

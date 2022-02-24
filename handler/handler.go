@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"log"
 	"orderapi/controller"
 	"orderapi/exception"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"google.golang.org/protobuf/internal/errors"
 )
 
 type Handler struct {
@@ -41,7 +43,7 @@ func (h *Handler) PostOrder(c *gin.Context) {
 
 	err = h.Validate.Struct(OrderStruct)
 	if err != nil {
-		exception.RespondWithBadRequestError(c, err)
+		exception.RespondWithBadRequestError(c, errors.New("wrong attribute type"))
 	}
 
 	e := h.Controller.MakeOrder(&OrderStruct)

@@ -43,11 +43,11 @@ func (c *Controller) MakeOrder(o *model.Order) error.Error {
 		if item.Qty < 1 {
 			return &error.BadRequestError{Err: errors.New("item's quantity must be at least 1")}
 		}
-		if _, f := inmemory.ListMenuInmemory[item.Name]; !f {
-			return &error.BadRequestError{Err: errors.New("Menu " + item.Name + " not found")}
+		if _, f := inmemory.ListMenuInmemory[item.Id]; !f {
+			return &error.BadRequestError{Err: errors.New("Menu " + inmemory.ListMenuInmemory[item.Id].Name + " not found")}
 
 		}
-		total += inmemory.ListMenuInmemory[item.Name].Price * int(item.Qty)
+		total += inmemory.ListMenuInmemory[item.Id].Price * int(item.Qty)
 	}
 	o.Total = int64(total)
 
@@ -78,7 +78,7 @@ func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Erro
 	for _, item := range order.Items {
 		i := model.OrderItemDetailResp{
 			Qty:  item.Qty,
-			Name: item.Name,
+			Name: inmemory.ListMenuInmemory[item.Id].Name,
 		}
 		items = append(items, i)
 	}
