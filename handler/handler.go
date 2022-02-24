@@ -58,6 +58,18 @@ func (h *Handler) PostOrder(c *gin.Context) {
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
 	defer EmptyRecover()
+	orderDetail, e := h.Controller.GetOrderById(c.Param("orderId"))
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Success retrieve order " + c.Param("orderId"),
+		"data":    *orderDetail,
+	})
+}
+func (h *Handler) PutOrderById(c *gin.Context) {
+	defer EmptyRecover()
 	j, err := (&model.OrderUpdate{}).ParseJSON(c.Request.Body)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
@@ -71,20 +83,6 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 	err = j.ValidateMissing()
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
-	}
-
-	c.JSON(200, gin.H{
-		"status":  "success",
-		"message": "Success retrieve order " + c.Param("orderId"),
-		"data":    "testing",
-	})
-}
-func (h *Handler) PutOrderById(c *gin.Context) {
-	defer EmptyRecover()
-	err := h.Controller.UpdateOrderStatusById(c.Param("orderId"))
-
-	if err != nil {
-		exception.CheckCaseErrorThenRespond(c, err)
 	}
 
 	c.JSON(204, gin.H{
