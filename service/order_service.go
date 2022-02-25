@@ -4,7 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"orderapi/error"
+	"orderapi/inmemory"
 	"orderapi/model"
+	"strconv"
+	"time"
 )
 
 type OrderService struct {
@@ -93,6 +96,51 @@ func (o *OrderService) UpdateOrderStatusById(id string) error.Error {
 	return nil
 }
 
+func (o *OrderService) UpdateOrderItemById(id string, oi []model.OrderItemUpdate) error.Error {
+	for _, item := range oi {
+		// check for menuId existence in runtime
+		if _, f := inmemory.ListMenuInmemory[item.Id]; !f {
+			return &error.NotFoundError{Err: errors.New("menu id " + strconv.Itoa(item.Id) + " not found")}
+		}
+		// if qty is not present, it means user want to delete particular item
+		if item.Qty == 0 {
+			q := "DELETE FROM order_item WHERE order_id = $1 AND menu_id = $2"
+			_, err := o.DB.Exec(q, id, item.Id)
+			if err != nil {
+				return &error.InternalServerError{Err: err}
+			}
+		} else {
+			// if menu is not exist, it means adding new item
+			if e := o.CheckItemInOrder(id, item.Id); e != nil {
+				oi := &model.OrderItemUpdate{
+					Id:  item.Id,
+					Qty: item.Qty,
+				}
+				err := o.AddItemForExistingOrder(id, oi)
+				if err != nil {
+					return err
+				}
+			} else {
+				q := "UPDATE order_item SET qty = $1 WHERE order_id = $2 and menu_id = $3"
+				_, err := o.DB.Exec(q, item.Qty, id, item.Id)
+				if err != nil {
+					return &error.InternalServerError{Err: err}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (o *OrderService) AddItemForExistingOrder(id string, item *model.OrderItemUpdate) error.Error {
+	q := "INSERT INTO order_item VALUES($1, $2, $3)"
+	_, err := o.DB.Exec(q, id, item.Id, item.Qty)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	return nil
+}
+
 func (o *OrderService) CheckOrderId(id string) error.Error {
 	q := "SELECT * FROM order_list WHERE id = $1"
 
@@ -104,6 +152,65 @@ func (o *OrderService) CheckOrderId(id string) error.Error {
 
 	if !r.Next() {
 		return &error.NotFoundError{Err: errors.New("order " + id + " not found")}
+	}
+	return nil
+}
+func (o *OrderService) CheckItemInOrder(orderId string, menuId int) error.Error {
+	q := "SELECT * FROM order_item WHERE order_id = $1 AND menu_id = $2"
+
+	r, err := o.DB.Query(q, orderId, menuId)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	defer r.Close()
+
+	if !r.Next() {
+		return &error.NotFoundError{Err: errors.New("order " + orderId + " not found")}
+	}
+	return nil
+}
+
+func (o *OrderService) UpdateStamp(id string) error.Error {
+	q := "UPDATE order_list SET updated_at WHERE id = $1"
+
+	_, err := o.DB.Exec(q, time.Now())
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	return nil
+}
+
+func (o *OrderService) UpdateTotal(id string) error.Error {
+	// first, retrieve the list of item
+	q := "SELECT * FROM order_item WHERE order_id = $1"
+
+	r, err := o.DB.Query(q, id)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	r.Close()
+
+	oi := []model.OrderItemUpdate{}
+	for r.Next() {
+		i := model.OrderItemUpdate{}
+		var temp string
+		err := r.Scan(&temp, &i.Id, &i.Qty)
+		if err != nil {
+			return &error.InternalServerError{Err: err}
+		}
+		oi = append(oi, i)
+	}
+
+	// calculate the total from the retrieved list of item then set to order_list table
+	total := 0
+	for _, item := range oi {
+		total += inmemory.ListMenuInmemory[item.Id].Price * int(item.Qty)
+	}
+
+	q = "UPDATE order_list SET total = $1 WHERE id = $2"
+	_, err = o.DB.Exec(q, total, id)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
 	}
 	return nil
 }

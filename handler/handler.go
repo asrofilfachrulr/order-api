@@ -70,8 +70,9 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 }
 func (h *Handler) PutOrderById(c *gin.Context) {
 	defer EmptyRecover(c)
+	id := c.Param("orderId")
 
-	e := h.Controller.CheckOrderId(c.Param("orderId"))
+	e := h.Controller.CheckOrderId(id)
 	if e != nil {
 		exception.CheckCaseErrorThenRespond(c, e)
 	}
@@ -95,9 +96,14 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 
 	log.Println(j)
 
+	e = h.Controller.UpdateOrderById(id, &j)
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+
 	c.JSON(200, gin.H{
 		"status":  "success",
-		"message": "Success updating order " + c.Param("orderId"),
+		"message": "Success updating order " + id,
 	})
 }
 func (h *Handler) DeleteOrderById(c *gin.Context) {

@@ -89,11 +89,40 @@ func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Erro
 	return orderDetail, nil
 }
 
-func (c *Controller) UpdateOrderStatusById(id string) error.Error {
-	err := c.Service.UpdateOrderStatusById(id)
-	if err != nil {
-		return err
+func (c *Controller) UpdateOrderById(id string, o *model.OrderUpdate) error.Error {
+	statusUpdated := false
+	itemsUpdated := false
+
+	// check for status attribute existence then execute change if exists
+	if o.Status != "" {
+		err := c.Service.UpdateOrderStatusById(id)
+		if err != nil {
+			return err
+		}
+		statusUpdated = true
 	}
+	// check for items attribute existence then execute change if exists
+	if len(o.Items) != 0 {
+		err := c.Service.UpdateOrderItemById(id, o.Items)
+		if err != nil {
+			return err
+		}
+		itemsUpdated = true
+	}
+
+	if statusUpdated || itemsUpdated {
+		err := c.Service.UpdateStamp(id)
+		if err != nil {
+			return err
+		}
+		if itemsUpdated {
+			err := c.Service.UpdateTotal(id)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 func (c *Controller) CheckOrderId(id string) error.Error {
