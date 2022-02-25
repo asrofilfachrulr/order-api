@@ -27,7 +27,6 @@ func NewHandler(c *controller.Controller, v *validator.Validate) *Handler {
 func EmptyRecover(c *gin.Context) {
 	if r := recover(); r != nil {
 		log.Printf("recovered from error [%s]", r)
-		exception.RespondWithInternalServerError(c, errors.New(r.(string)))
 	}
 }
 
@@ -72,6 +71,12 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 func (h *Handler) PutOrderById(c *gin.Context) {
 	log.Println("Entering PutOrderById block")
 	defer EmptyRecover(c)
+
+	e := h.Controller.CheckOrderId(c.Param("orderId"))
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+
 	j, err := (&model.OrderUpdate{}).ParseJSON(c.Request.Body)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
@@ -89,7 +94,7 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 	}
 
 	log.Println("Ending PutOrderById block")
-	c.JSON(204, gin.H{
+	c.JSON(200, gin.H{
 		"status":  "success",
 		"message": "Success updating order " + c.Param("orderId"),
 	})

@@ -92,3 +92,18 @@ func (o *OrderService) UpdateOrderStatusById(id string) error.Error {
 	}
 	return nil
 }
+
+func (o *OrderService) CheckOrderId(id string) error.Error {
+	q := "SELECT * FROM order_list WHERE id = $1"
+
+	r, err := o.DB.Query(q, id)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	defer r.Close()
+
+	if !r.Next() {
+		return &error.NotFoundError{Err: errors.New("order " + id + " not found")}
+	}
+	return nil
+}

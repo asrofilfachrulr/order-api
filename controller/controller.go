@@ -6,6 +6,7 @@ import (
 	"orderapi/inmemory"
 	"orderapi/model"
 	"orderapi/service"
+	"strconv"
 	"time"
 
 	nanoid "github.com/matoous/go-nanoid/v2"
@@ -44,7 +45,7 @@ func (c *Controller) MakeOrder(o *model.Order) error.Error {
 			return &error.BadRequestError{Err: errors.New("item's quantity must be at least 1")}
 		}
 		if _, f := inmemory.ListMenuInmemory[item.Id]; !f {
-			return &error.BadRequestError{Err: errors.New("Menu " + inmemory.ListMenuInmemory[item.Id].Name + " not found")}
+			return &error.BadRequestError{Err: errors.New("Menu " + strconv.Itoa(item.Id) + " not found")}
 
 		}
 		total += inmemory.ListMenuInmemory[item.Id].Price * int(item.Qty)
@@ -90,6 +91,13 @@ func (c *Controller) GetOrderById(id string) (*model.OrderDetailResp, error.Erro
 
 func (c *Controller) UpdateOrderStatusById(id string) error.Error {
 	err := c.Service.UpdateOrderStatusById(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (c *Controller) CheckOrderId(id string) error.Error {
+	err := c.Service.CheckOrderId(id)
 	if err != nil {
 		return err
 	}
