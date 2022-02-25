@@ -5,13 +5,19 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 )
 
+type OrderItemUpdate struct {
+	Id  int  `json:"id" validate:"required"`
+	Qty int8 `json:"qty"`
+}
+
 type OrderUpdate struct {
-	Status string      `json:"status" validate:"status"`
-	Items  []OrderItem `json:"items" validate:"dive"`
+	Status string            `json:"status" validate:"status-validate"`
+	Items  []OrderItemUpdate `json:"items" validate:"dive"`
 }
 
 func (o *OrderUpdate) ParseJSON(i io.ReadCloser) (OrderUpdate, error) {
@@ -26,6 +32,7 @@ func (o *OrderUpdate) ParseJSON(i io.ReadCloser) (OrderUpdate, error) {
 	if err != nil {
 		return OrderUpdate{}, err
 	}
+
 	return newOrderUpdate, nil
 }
 
@@ -48,10 +55,13 @@ func (o *OrderUpdate) ValidateMissing() error {
 
 func ValidateStatus(f validator.FieldLevel) bool {
 	status := f.Field().String()
+	log.Printf("validating status, value %s\n", status)
 	for _, s := range [...]string{"paid", "unpaid", "conflict"} {
 		if s == status {
+			log.Println("Found match")
 			return true
 		}
 	}
+	log.Println("Not found match")
 	return false
 }

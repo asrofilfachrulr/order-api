@@ -82,7 +82,8 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 		exception.RespondWithBadRequestError(c, err)
 	}
 
-	h.Validate.RegisterValidation("status", model.ValidateStatus)
+	h.Validate.RegisterValidation("status-validate", model.ValidateStatus)
+
 	err = h.Validate.Struct(j)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
