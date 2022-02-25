@@ -69,7 +69,6 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 	})
 }
 func (h *Handler) PutOrderById(c *gin.Context) {
-	log.Println("Entering PutOrderById block")
 	defer EmptyRecover(c)
 
 	e := h.Controller.CheckOrderId(c.Param("orderId"))
@@ -82,6 +81,11 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 		exception.RespondWithBadRequestError(c, err)
 	}
 
+	err = j.CheckParsedJSON()
+	if err != nil {
+		exception.RespondWithBadRequestError(c, err)
+	}
+
 	h.Validate.RegisterValidation("status-validate", model.ValidateStatus)
 
 	err = h.Validate.Struct(j)
@@ -89,12 +93,8 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 		exception.RespondWithBadRequestError(c, err)
 	}
 
-	err = j.ValidateMissing()
-	if err != nil {
-		exception.RespondWithBadRequestError(c, err)
-	}
+	log.Println(j)
 
-	log.Println("Ending PutOrderById block")
 	c.JSON(200, gin.H{
 		"status":  "success",
 		"message": "Success updating order " + c.Param("orderId"),

@@ -32,22 +32,25 @@ func (o *OrderUpdate) ParseJSON(i io.ReadCloser) (OrderUpdate, error) {
 	if err != nil {
 		return OrderUpdate{}, err
 	}
-
+	log.Printf("Success parse json: %v", newOrderUpdate)
 	return newOrderUpdate, nil
 }
 
-func (o *OrderUpdate) ValidateMissing() error {
-	missing := false
+func (o *OrderUpdate) CheckParsedJSON() error {
+	missing := 0
+	log.Println(o.Items)
+	log.Println(len(o.Items))
 
-	if v := o.Status; v == "" {
-		missing = true
+	log.Printf("missing: %v\n", missing)
+	if len(o.Items) == 0 {
+		missing += 1
 	}
-	if v := o.Items; len(v) == 0 {
-		missing = true
+	if o.Status == "" {
+		missing += 1
 	}
 
-	if missing {
-		return errors.New("attribute missing")
+	if missing == 2 {
+		return errors.New("please specifiy attribute that need to be changed")
 	}
 
 	return nil
@@ -55,13 +58,10 @@ func (o *OrderUpdate) ValidateMissing() error {
 
 func ValidateStatus(f validator.FieldLevel) bool {
 	status := f.Field().String()
-	log.Printf("validating status, value %s\n", status)
-	for _, s := range [...]string{"paid", "unpaid", "conflict"} {
+	for _, s := range [...]string{"paid", "unpaid", "conflict", ""} {
 		if s == status {
-			log.Println("Found match")
 			return true
 		}
 	}
-	log.Println("Not found match")
 	return false
 }
