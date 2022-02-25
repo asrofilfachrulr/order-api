@@ -97,7 +97,7 @@ func (c *Controller) UpdateOrderById(id string, o *model.OrderUpdate) error.Erro
 	// check for status attribute existence then execute change if exists
 	if o.Status != "" {
 		log.Println("Updating status")
-		err := c.Service.UpdateOrderStatusById(id)
+		err := c.Service.UpdateOrderStatusById(id, o.Status)
 		if err != nil {
 			return err
 		}

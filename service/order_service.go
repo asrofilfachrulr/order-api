@@ -83,10 +83,10 @@ func (o *OrderService) GetOrderById(id string) (*model.Order, error.Error) {
 	return &order, nil
 }
 
-func (o *OrderService) UpdateOrderStatusById(id string) error.Error {
-	q := "UPDATE order_list SET status = 'paid' WHERE id = $1"
+func (o *OrderService) UpdateOrderStatusById(id string, status string) error.Error {
+	q := "UPDATE order_list SET status = $1 WHERE id = $2"
 
-	r, err := o.DB.Exec(q, id)
+	r, err := o.DB.Exec(q, status, id)
 	if err != nil {
 		return &error.InternalServerError{Err: err}
 	}
