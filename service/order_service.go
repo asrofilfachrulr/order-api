@@ -171,9 +171,9 @@ func (o *OrderService) CheckItemInOrder(orderId string, menuId int) error.Error 
 }
 
 func (o *OrderService) UpdateStamp(id string) error.Error {
-	q := "UPDATE order_list SET updated_at WHERE id = $1"
+	q := "UPDATE order_list SET updated_at = $1 WHERE id = $2"
 
-	_, err := o.DB.Exec(q, time.Now())
+	_, err := o.DB.Exec(q, time.Now(), id)
 	if err != nil {
 		return &error.InternalServerError{Err: err}
 	}

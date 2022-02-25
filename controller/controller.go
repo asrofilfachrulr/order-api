@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"log"
 	"orderapi/error"
 	"orderapi/inmemory"
 	"orderapi/model"
@@ -95,31 +96,39 @@ func (c *Controller) UpdateOrderById(id string, o *model.OrderUpdate) error.Erro
 
 	// check for status attribute existence then execute change if exists
 	if o.Status != "" {
+		log.Println("Updating status")
 		err := c.Service.UpdateOrderStatusById(id)
 		if err != nil {
 			return err
 		}
+		log.Println("Status updated")
 		statusUpdated = true
 	}
 	// check for items attribute existence then execute change if exists
 	if len(o.Items) != 0 {
+		log.Println("Updating items")
 		err := c.Service.UpdateOrderItemById(id, o.Items)
 		if err != nil {
 			return err
 		}
+		log.Println("Items updated")
 		itemsUpdated = true
 	}
 
 	if statusUpdated || itemsUpdated {
+		log.Println("Updating stamp")
 		err := c.Service.UpdateStamp(id)
 		if err != nil {
 			return err
 		}
+		log.Println("Stamp updated")
 		if itemsUpdated {
+			log.Println("Updating total")
 			err := c.Service.UpdateTotal(id)
 			if err != nil {
 				return err
 			}
+			log.Println("Total updated")
 		}
 	}
 
