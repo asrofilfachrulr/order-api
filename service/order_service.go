@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"orderapi/error"
 	"orderapi/inmemory"
 	"orderapi/model"
@@ -182,16 +183,18 @@ func (o *OrderService) UpdateStamp(id string) error.Error {
 
 func (o *OrderService) UpdateTotal(id string) error.Error {
 	// first, retrieve the list of item
+	log.Printf("updating total for order id %s\n", id)
 	q := "SELECT * FROM order_item WHERE order_id = $1"
 
 	r, err := o.DB.Query(q, id)
 	if err != nil {
 		return &error.InternalServerError{Err: err}
 	}
-	r.Close()
+	defer r.Close()
 
 	oi := []model.OrderItemUpdate{}
 	for r.Next() {
+		log.Println("retrieve one item..")
 		i := model.OrderItemUpdate{}
 		var temp string
 		err := r.Scan(&temp, &i.Id, &i.Qty)
@@ -201,10 +204,15 @@ func (o *OrderService) UpdateTotal(id string) error.Error {
 		oi = append(oi, i)
 	}
 
+	log.Printf("retrieved items: %v\n", oi)
 	// calculate the total from the retrieved list of item then set to order_list table
 	total := 0
 	for _, item := range oi {
-		total += inmemory.ListMenuInmemory[item.Id].Price * int(item.Qty)
+		if it, f := inmemory.ListMenuInmemory[item.Id]; f {
+			total += it.Price * int(item.Qty)
+		} else {
+			return &error.InternalServerError{Err: errors.New("menu id " + strconv.Itoa(item.Id) + " not found")}
+		}
 	}
 
 	q = "UPDATE order_list SET total = $1 WHERE id = $2"
