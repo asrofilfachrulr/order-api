@@ -21,6 +21,11 @@ func NewOrderService(db *sql.DB) *OrderService {
 	}
 }
 
+func NullStringPointer() *string {
+	var temp string = ""
+	return &temp
+}
+
 func (o *OrderService) AddOrder(order *model.Order) error.Error {
 	q := "INSERT INTO order_list VALUES($1, $2, $3, $4, $5)"
 	_, err := o.DB.Exec(q, order.Id, order.CreatedAt, order.UpdatedAt, order.Status, order.Total)
@@ -68,8 +73,8 @@ func (o *OrderService) GetOrderById(id string) (*model.Order, error.Error) {
 
 	for r.Next() {
 		oi := model.OrderItem{}
-		var temp string
-		err = r.Scan(&temp, &oi.Id, &oi.Qty)
+
+		err = r.Scan(NullStringPointer(), &oi.Id, &oi.Qty)
 		if err != nil {
 			return nil, &error.InternalServerError{Err: err}
 		}
@@ -236,6 +241,57 @@ func (o *OrderService) DeleteOrderById(id string) error.Error {
 	_, err = o.DB.Exec(q, id)
 	if err != nil {
 		return &error.InternalServerError{Err: err}
+	}
+
+	return nil
+}
+
+// no filter
+func (o *OrderService) GetAllOrder(os *[]model.Order) error.Error {
+	q := "SELECT * FROM order_list"
+	r, err := o.DB.Query(q)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+	defer r.Close()
+
+	for r.Next() {
+		orderTemp := model.Order{}
+		err := r.Scan(&orderTemp.Id, &orderTemp.CreatedAt, &orderTemp.UpdatedAt, &orderTemp.Status, &orderTemp.Total)
+		if err != nil {
+			return &error.InternalServerError{Err: err}
+		}
+		*os = append(*os, orderTemp)
+	}
+
+	if len(*os) == 0 {
+		return &error.InternalServerError{Err: errors.New("DB is empty or query failed")}
+	}
+	r.Close()
+
+	for _, order := range *os {
+		q := "SELECT * FROM order_item WHERE order_id = $1"
+		r, err := o.DB.Query(q, order.Id)
+		if err != nil {
+			return &error.InternalServerError{Err: err}
+		}
+		defer r.Close()
+
+		items := []model.OrderItem{}
+		for r.Next() {
+			item := model.OrderItem{}
+			err := r.Scan(NullStringPointer(), &item.Id, &item.Qty)
+			if err != nil {
+				return &error.InternalServerError{Err: err}
+			}
+			items = append(items, item)
+		}
+		r.Close()
+
+		if len(items) == 0 {
+			log.Printf("items is zero for order id %s", order.Id)
+		}
+		order.Items = items
 	}
 
 	return nil

@@ -53,7 +53,7 @@ func (h *Handler) PostOrder(c *gin.Context) {
 	c.JSON(201, gin.H{
 		"status":  "success",
 		"message": "succeed register new order",
-		"data":    helper.ToOrderResponse(&OrderStruct),
+		"data":    helper.ToOrderCreatedResponse(&OrderStruct),
 	})
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
@@ -127,9 +127,17 @@ func (h *Handler) DeleteOrderById(c *gin.Context) {
 
 // Orders
 func (h *Handler) GetMultipleOrder(c *gin.Context) {
-	// TODO: implement this are you kidding me for 2000 bucks
+	defer EmptyRecover()
+
+	orders, e := h.Controller.GetAllOrder()
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+
 	c.JSON(200, gin.H{
-		"message": "You're at GetMultipleOrder",
+		"status":  "success",
+		"message": "success retrieving all data",
+		"data":    helper.ToOrdersBriefResponse(orders),
 	})
 }
 func (h *Handler) DeleteMultipleOrder(c *gin.Context) {

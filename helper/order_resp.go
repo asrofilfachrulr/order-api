@@ -1,8 +1,11 @@
 package helper
 
-import "orderapi/model"
+import (
+	"orderapi/model"
+	"time"
+)
 
-func ToOrderResponse(o *model.Order) *model.OrderCreatedResp {
+func ToOrderCreatedResponse(o *model.Order) *model.OrderCreatedResp {
 	return &model.OrderCreatedResp{
 		OrderId:   o.Id,
 		CreatedAt: o.CreatedAt,
@@ -10,8 +13,16 @@ func ToOrderResponse(o *model.Order) *model.OrderCreatedResp {
 	}
 }
 
-// func ToDetailedOrderResponse(o *model.Order) *model.OrderDetailResp {
-// 	for i, item := range o.Items {
-// 		item.
-// 	}
-// }
+func ToOrdersBriefResponse(os []model.Order) []model.OrderBrief {
+	obs := []model.OrderBrief{}
+
+	for _, order := range os {
+		obs = append(obs, model.OrderBrief{
+			Id:        order.Id,
+			Status:    order.Status,
+			UpdatedAt: order.UpdatedAt.Format(time.RFC1123),
+			Total:     order.Total,
+		})
+	}
+	return obs
+}
