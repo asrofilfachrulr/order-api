@@ -24,7 +24,7 @@ func NewHandler(c *controller.Controller, v *validator.Validate) *Handler {
 	}
 }
 
-func EmptyRecover(c *gin.Context) {
+func EmptyRecover() {
 	if r := recover(); r != nil {
 		log.Printf("recovered from error [%s]", r)
 	}
@@ -32,7 +32,7 @@ func EmptyRecover(c *gin.Context) {
 
 // Order
 func (h *Handler) PostOrder(c *gin.Context) {
-	defer EmptyRecover(c)
+	defer EmptyRecover()
 	OrderStruct, err := (&model.Order{}).ParseJSON(c.Request.Body)
 	if err != nil {
 		exception.RespondWithBadRequestError(c, err)
@@ -57,7 +57,7 @@ func (h *Handler) PostOrder(c *gin.Context) {
 	})
 }
 func (h *Handler) GetOrderById(c *gin.Context) {
-	defer EmptyRecover(c)
+	defer EmptyRecover()
 	orderDetail, e := h.Controller.GetOrderById(c.Param("orderId"))
 	if e != nil {
 		exception.CheckCaseErrorThenRespond(c, e)
@@ -69,7 +69,7 @@ func (h *Handler) GetOrderById(c *gin.Context) {
 	})
 }
 func (h *Handler) PutOrderById(c *gin.Context) {
-	defer EmptyRecover(c)
+	defer EmptyRecover()
 	id := c.Param("orderId")
 
 	e := h.Controller.CheckOrderId(id)
@@ -107,9 +107,21 @@ func (h *Handler) PutOrderById(c *gin.Context) {
 	})
 }
 func (h *Handler) DeleteOrderById(c *gin.Context) {
-	// TODO: implement this are you kidding me for 2000 bucks
+	defer EmptyRecover()
+
+	id := c.Param("orderId")
+
+	e := h.Controller.CheckOrderId(id)
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+	e = h.Controller.DeleteOrderById(id)
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
 	c.JSON(200, gin.H{
-		"message": "You're at DeleteOrderById by id =" + c.Param("orderId"),
+		"status":  "success",
+		"message": "Success deleting id =" + id,
 	})
 }
 

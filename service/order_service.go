@@ -222,3 +222,21 @@ func (o *OrderService) UpdateTotal(id string) error.Error {
 	}
 	return nil
 }
+
+func (o *OrderService) DeleteOrderById(id string) error.Error {
+	// First deleting the order_item since they pointing to order_list
+	q := "DELETE FROM order_item WHERE order_id = $1"
+	_, err := o.DB.Exec(q, id)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+
+	// Now deleting order_list
+	q = "DELETE FROM order_list WHERE id = $1"
+	_, err = o.DB.Exec(q, id)
+	if err != nil {
+		return &error.InternalServerError{Err: err}
+	}
+
+	return nil
+}

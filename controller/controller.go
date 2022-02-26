@@ -134,8 +134,17 @@ func (c *Controller) UpdateOrderById(id string, o *model.OrderUpdate) error.Erro
 
 	return nil
 }
+
 func (c *Controller) CheckOrderId(id string) error.Error {
 	err := c.Service.CheckOrderId(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Controller) DeleteOrderById(id string) error.Error {
+	err := c.Service.DeleteOrderById(id)
 	if err != nil {
 		return err
 	}
