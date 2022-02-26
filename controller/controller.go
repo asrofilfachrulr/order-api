@@ -151,9 +151,9 @@ func (c *Controller) DeleteOrderById(id string) error.Error {
 	return nil
 }
 
-func (c *Controller) GetAllOrder() ([]model.Order, error.Error) {
+func (c *Controller) GetAllOrder(f *model.Filter) ([]model.Order, error.Error) {
 	orders := []model.Order{}
-	err := c.Service.GetAllOrder(&orders)
+	err := c.Service.GetAllOrder(f, &orders)
 	if err != nil {
 		return nil, err
 	}

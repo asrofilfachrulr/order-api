@@ -128,8 +128,15 @@ func (h *Handler) DeleteOrderById(c *gin.Context) {
 // Orders
 func (h *Handler) GetMultipleOrder(c *gin.Context) {
 	defer EmptyRecover()
+	f := &model.Filter{}
 
-	orders, e := h.Controller.GetAllOrder()
+	// getting query params value
+	f.Status, _ = c.GetQuery("status")
+	// f.Time, _ = c.GetQuery("time")
+
+	f.ValidateStatus()
+
+	orders, e := h.Controller.GetAllOrder(f)
 	if e != nil {
 		exception.CheckCaseErrorThenRespond(c, e)
 	}
