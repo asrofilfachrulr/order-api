@@ -1,6 +1,7 @@
 package model
 
 import (
+	"log"
 	"time"
 )
 
@@ -20,8 +21,10 @@ func (f *Filter) ValidateTime() {
 	if f.From == "" {
 		return
 	}
-	from, err := time.Parse("2016-02-01", f.From)
+	from, err := time.Parse("2006-01-02", f.From)
 	if err != nil {
+		log.Println("error parsing from")
+		log.Println(err)
 		f.From = ""
 		return
 	}
@@ -29,13 +32,16 @@ func (f *Filter) ValidateTime() {
 	if f.To == "" {
 		return
 	}
-	to, err := time.Parse("2016-02-01", f.To)
+	to, err := time.Parse("2006-01-02", f.To)
 	if err != nil {
+		log.Println("error parsing to")
 		f.To = ""
 		return
 	}
 
 	if from.After(to) {
+		log.Println("illogical address")
+
 		f.From = ""
 		f.To = ""
 	}

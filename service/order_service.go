@@ -254,16 +254,16 @@ func (o *OrderService) GetAllOrder(f *model.Filter, os *[]model.Order) berror.Er
 	today := time.Now()
 
 	if f.Status != "" && f.From == "" {
-		// case status isn't empty but time is
+		log.Println("case status isn't empty but time is")
 		q = "SELECT * FROM order_list WHERE status = $1"
 		row, err = o.DB.Query(q, f.Status)
 	} else if f.Status == "" && f.From == "" {
-		// case both status and time are empty
+		log.Println("case both status and time are empty")
 		q = "SELECT * FROM order_list"
 		row, err = o.DB.Query(q)
 	} else if f.Status == "" && f.From != "" {
-		// case status empty but time isnt empty (first look for 'from' value)
-		if today.Format("2016-02-01") == f.From {
+		log.Println("case status empty but time isnt empty (first look for 'from' value)")
+		if today.Format("2006-01-02") == f.From {
 			// if only today
 			q = "SELECT * FROM order_list WHERE updated_at >= now()::date"
 			row, err = o.DB.Query(q)
@@ -271,12 +271,12 @@ func (o *OrderService) GetAllOrder(f *model.Filter, os *[]model.Order) berror.Er
 			// if From is past
 			q = "SELECT * FROM order_list WHERE updated_at BETWEEN $1::date AND $2::date + interval '1 day'"
 			if f.To == "" {
-				f.To = time.Now().Format("2016-02-01")
+				f.To = time.Now().Format("2006-01-02")
 			}
 			row, err = o.DB.Query(q, f.From, f.To)
 		}
 	} else {
-		// case neither empty
+		log.Println("case neither empty")
 		q = "SELECT * FROM order_list WHERE updated_at BETWEEN $1::date AND $2::date + interval '1 day' AND status = $3"
 		row, err = o.DB.Query(q, f.From, f.To, f.Status)
 	}
