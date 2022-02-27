@@ -7,7 +7,7 @@ import (
 	berror "orderapi/error"
 	"orderapi/inmemory"
 	"orderapi/model"
-	"strconv"
+	"orderapi/utils"
 	"time"
 )
 
@@ -106,7 +106,7 @@ func (o *OrderService) UpdateOrderItemById(id string, oi []model.OrderItemUpdate
 	for _, item := range oi {
 		// check for menuId existence in runtime
 		if _, f := inmemory.ListMenuInmemory[item.Id]; !f {
-			return &berror.NotFoundError{Err: errors.New("menu id " + strconv.Itoa(item.Id) + " not found")}
+			return &berror.NotFoundError{Err: errors.New("menu id " + utils.IntToString(item.Id) + " not found")}
 		}
 		// if qty is not present, it means user want to delete particular item
 		if item.Qty == 0 {
@@ -216,7 +216,7 @@ func (o *OrderService) UpdateTotal(id string) berror.Error {
 		if it, f := inmemory.ListMenuInmemory[item.Id]; f {
 			total += it.Price * int(item.Qty)
 		} else {
-			return &berror.InternalServerError{Err: errors.New("menu id " + strconv.Itoa(item.Id) + " not found")}
+			return &berror.InternalServerError{Err: errors.New("menu id " + utils.IntToString(item.Id) + " not found")}
 		}
 	}
 
@@ -251,13 +251,34 @@ func (o *OrderService) GetAllOrder(f *model.Filter, os *[]model.Order) berror.Er
 	q := ""
 	var row *sql.Rows
 	var err error
+	today := time.Now()
 
-	if f.Status != "" {
+	if f.Status != "" && f.From == "" {
+		// case status isn't empty but time is
 		q = "SELECT * FROM order_list WHERE status = $1"
 		row, err = o.DB.Query(q, f.Status)
-	} else {
+	} else if f.Status == "" && f.From == "" {
+		// case both status and time are empty
 		q = "SELECT * FROM order_list"
 		row, err = o.DB.Query(q)
+	} else if f.Status == "" && f.From != "" {
+		// case status empty but time isnt empty (first look for 'from' value)
+		if today.Format("2016-02-01") == f.From {
+			// if only today
+			q = "SELECT * FROM order_list WHERE updated_at >= now()::date"
+			row, err = o.DB.Query(q)
+		} else {
+			// if From is past
+			q = "SELECT * FROM order_list WHERE updated_at BETWEEN $1::date AND $2::date + interval '1 day'"
+			if f.To == "" {
+				f.To = time.Now().Format("2016-02-01")
+			}
+			row, err = o.DB.Query(q, f.From, f.To)
+		}
+	} else {
+		// case neither empty
+		q = "SELECT * FROM order_list WHERE updated_at BETWEEN $1::date AND $2::date + interval '1 day' AND status = $3"
+		row, err = o.DB.Query(q, f.From, f.To, f.Status)
 	}
 
 	if err != nil {

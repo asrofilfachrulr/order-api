@@ -132,9 +132,11 @@ func (h *Handler) GetMultipleOrder(c *gin.Context) {
 
 	// getting query params value
 	f.Status, _ = c.GetQuery("status")
-	// f.Time, _ = c.GetQuery("time")
+	f.From, _ = c.GetQuery("from")
+	f.To, _ = c.GetQuery("to")
 
 	f.ValidateStatus()
+	f.ValidateTime()
 
 	orders, e := h.Controller.GetAllOrder(f)
 	if e != nil {
