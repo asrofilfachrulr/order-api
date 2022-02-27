@@ -1050,7 +1050,7 @@
 							"response": []
 						},
 						{
-							"name": "Get All Order With Correct [status] filter = [paid]",
+							"name": "Get All Order With Correct [status] filter = [paid] only",
 							"event": [
 								{
 									"listen": "test",
@@ -1089,7 +1089,7 @@
 							"response": []
 						},
 						{
-							"name": "Get All Order With Correct [status] filter = [unpaid]",
+							"name": "Get All Order With Correct [status] filter = [unpaid] only",
 							"event": [
 								{
 									"listen": "test",
@@ -1128,7 +1128,7 @@
 							"response": []
 						},
 						{
-							"name": "Get All Order With Correct [status] filter = [conflict]",
+							"name": "Get All Order With Correct [status] filter = [conflict] only",
 							"event": [
 								{
 									"listen": "test",
@@ -1204,6 +1204,258 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Get All Order With Correct [from] filter = today",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/orders?from={{todayDate}}",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "{{todayDate}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Order With Correct [from] filter in the past only",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/orders?from={{pastFromDate}}",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "{{pastFromDate}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Order With Correct [from] and [to] filter only",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/orders?from={{pastFromDate}}&to={{pastToDate}}",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "{{pastFromDate}}"
+										},
+										{
+											"key": "to",
+											"value": "{{pastToDate}}"
+										},
+										{
+											"key": "to",
+											"value": "{{pastToDate}}",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Order With Correct [from], [to], and [status] = paid filter",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/orders?from={{pastFromDate}}&to={{pastToDate}}&status=paid",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "{{pastFromDate}}"
+										},
+										{
+											"key": "to",
+											"value": "{{pastToDate}}"
+										},
+										{
+											"key": "status",
+											"value": "paid"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Order With Correct [from], [to], and [status] = unpaid filter Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/orders?from={{pastFromDate}}&to={{pastToDate}}&status=unpaid",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "from",
+											"value": "{{pastFromDate}}"
+										},
+										{
+											"key": "to",
+											"value": "{{pastToDate}}"
+										},
+										{
+											"key": "status",
+											"value": "unpaid"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const today = new Date()",
+									"const todayString = today.toISOString().slice(0, 10);",
+									"pm.environment.set(\"todayDate\", todayString);",
+									"",
+									"const pastFromDay = today.getDate() - 2;",
+									"const pastToDay = today.getDate() - 1;",
+									"",
+									"const pastFromString = today.getFullYear() + \"-\" + today.getMonth() + \"-\" + pastFromDay;",
+									"const pastToString = today.getFullYear() + \"-\" + today.getMonth() + \"-\" + pastToDay;",
+									"",
+									"pm.environment.set(\"pastFromDate\", pastFromString);",
+									"pm.environment.set(\"pastToDate\", pastToString);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
 						}
 					]
 				}
