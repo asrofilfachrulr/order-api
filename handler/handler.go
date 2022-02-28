@@ -7,6 +7,7 @@ import (
 	"orderapi/exception"
 	"orderapi/helper"
 	"orderapi/model"
+	"orderapi/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -142,11 +143,12 @@ func (h *Handler) GetMultipleOrder(c *gin.Context) {
 	if e != nil {
 		exception.CheckCaseErrorThenRespond(c, e)
 	}
-
+	data := helper.ToOrdersBriefResponse(orders)
+	count := utils.IntToString(len(data))
 	c.JSON(200, gin.H{
 		"status":  "success",
-		"message": "success retrieving all data",
-		"data":    helper.ToOrdersBriefResponse(orders),
+		"message": "success retrieving all data: " + count + " item(s)",
+		"data":    data,
 	})
 }
 func (h *Handler) DeleteMultipleOrder(c *gin.Context) {
