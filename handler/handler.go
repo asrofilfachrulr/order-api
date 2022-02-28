@@ -152,14 +152,42 @@ func (h *Handler) GetMultipleOrder(c *gin.Context) {
 	})
 }
 func (h *Handler) DeleteMultipleOrder(c *gin.Context) {
-	// TODO: implement this are you kidding me for 2000 bucks
+	defer EmptyRecover()
+
+	FilterStruct, err := (&model.Filter{}).ParseJSON(c.Request.Body)
+	if err != nil {
+		exception.RespondWithBadRequestError(c, err)
+	}
+	FilterStruct.ValidateStatus()
+	FilterStruct.ValidateTime()
+
+	e := h.Controller.DeleteOrdersByFilter(&FilterStruct)
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+
 	c.JSON(200, gin.H{
-		"message": "You're at DeleteMultipleOrder",
+		"status":  "success",
+		"message": "success deleting data",
 	})
 }
 func (h *Handler) PutMultipleOrder(c *gin.Context) {
-	// TODO: implement this are you kidding me for 2000 bucks
+	defer EmptyRecover()
+
+	FilterStruct, err := (&model.Filter{}).ParseJSON(c.Request.Body)
+	if err != nil {
+		exception.RespondWithBadRequestError(c, err)
+	}
+	FilterStruct.ValidateStatus()
+	FilterStruct.ValidateTime()
+
+	e := h.Controller.UpdateOrdersStatusByDate(&FilterStruct)
+	if e != nil {
+		exception.CheckCaseErrorThenRespond(c, e)
+	}
+
 	c.JSON(200, gin.H{
-		"message": "You're at PutMultipleOrder",
+		"status":  "success",
+		"message": "success updating data",
 	})
 }

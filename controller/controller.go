@@ -159,3 +159,18 @@ func (c *Controller) GetAllOrder(f *model.Filter) ([]model.Order, error.Error) {
 	}
 	return orders, nil
 }
+
+func (c *Controller) UpdateOrdersStatusByDate(f *model.Filter) error.Error {
+	err := c.Service.UpdateOrdersStatusByDate(f)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (c *Controller) DeleteOrdersByFilter(f *model.Filter) error.Error {
+	err := c.Service.DeleteOrdersByFilter(f)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -1,6 +1,9 @@
 package model
 
 import (
+	"encoding/json"
+	"io"
+	"io/ioutil"
 	"log"
 	"time"
 )
@@ -9,6 +12,21 @@ type Filter struct {
 	Status string
 	From   string
 	To     string
+}
+
+func (f *Filter) ParseJSON(i io.ReadCloser) (Filter, error) {
+	dataByte, err := ioutil.ReadAll(i)
+	if err != nil {
+		return Filter{}, err
+	}
+
+	newFilter := Filter{}
+
+	err = json.Unmarshal(dataByte, &newFilter)
+	if err != nil {
+		return Filter{}, err
+	}
+	return newFilter, nil
 }
 
 func (f *Filter) ValidateStatus() {

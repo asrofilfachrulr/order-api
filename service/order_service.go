@@ -302,3 +302,50 @@ func (o *OrderService) GetAllOrder(f *model.Filter, os *[]model.Order) berror.Er
 
 	return nil
 }
+
+func (o *OrderService) UpdateOrdersStatusByDate(f *model.Filter) berror.Error {
+	var q string
+	var err error
+
+	if f.To == "" && f.From == "" {
+		q = "UPDATE order_list SET status = $1"
+		_, err = o.DB.Exec(q, f.Status)
+	} else if f.From != "" {
+		if f.To != "" {
+			q = "UPDATE order_list SET status = $1 WHERE updated_at BETWEEN $2::date AND $3::date + interval '1 day'"
+			_, err = o.DB.Exec(q, f.Status, f.From, f.To)
+		} else {
+			q = "UPDATE order_list SET status = $1 WHERE updated_at >= $2::date"
+			_, err = o.DB.Exec(q, f.Status, f.From)
+		}
+	}
+
+	if err != nil {
+		return &berror.InternalServerError{Err: err}
+	}
+
+	return nil
+}
+func (o *OrderService) DeleteOrdersByFilter(f *model.Filter) berror.Error {
+	var q string
+	var err error
+
+	if f.To == "" && f.From == "" {
+		q = "DELETE FROM order_list SET status = $1"
+		_, err = o.DB.Exec(q, f.Status)
+	} else if f.From != "" {
+		if f.To != "" {
+			q = "DELETE FROM order_list SET status = $1 WHERE updated_at BETWEEN $2::date AND $3::date + interval '1 day'"
+			_, err = o.DB.Exec(q, f.Status, f.From, f.To)
+		} else {
+			q = "DELETE FROM order_list SET status = $1 WHERE updated_at >= $2::date"
+			_, err = o.DB.Exec(q, f.Status, f.From)
+		}
+	}
+
+	if err != nil {
+		return &berror.InternalServerError{Err: err}
+	}
+
+	return nil
+}
